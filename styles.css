@@ -1,0 +1,54 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #ffffff;
+  color: white;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #121b22;
+  padding: 15px 20px;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.menu,
+.refresh {
+  font-size: 26px;
+  cursor: pointer;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 15px;
+  padding: 20px;
+}
+
+.card {
+  background-color: #0e1a23;
+  padding: 15px;
+  border-radius: 15px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  color: #ccc;
+  min-height: 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.card .label {
+  font-size: 14px;
+  color: #aaa;
+}
+
+.kerala-card {
+  grid-column: 1 / -1;
+  background-color: #0e1a23;
+  font-size: 22px;
+}
