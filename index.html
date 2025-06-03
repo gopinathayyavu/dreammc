@@ -1,14 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lottery Schedule</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
+
+  <!-- Sidebar -->
+  <div id="sidebar" class="sidebar">
+    <a href="#" class="close-btn" onclick="toggleSidebar()">×</a>
+    <a href="index.html">Home</a>
+    <a href="pre-result.html">Previous Results</a>
+    <a href="dwn-result.html">Download Results</a>
+    <a href="contactus.html">Contact Us</a>
+  </div>
+
+  <!-- Main content -->
   <div class="header">
-    <div class="menu">&#9776;</div>
+    <div class="menu" onclick="toggleSidebar()">&#9776;</div>
     <div class="title">Today</div>
     <div class="refresh">&#x21bb;</div>
   </div>
@@ -28,5 +41,14 @@
     <div class="card"><span class="label">06:00 PM</span><br>Dear Eve</div>
     <div class="card"><span class="label">08:00 PM</span><br>Dear Nig</div>
   </div>
+
+  <!-- Small JavaScript for sidebar toggle -->
+  <script>
+    function toggleSidebar() {
+      document.getElementById("sidebar").classList.toggle("active");
+    }
+  </script>
+
 </body>
+
 </html>

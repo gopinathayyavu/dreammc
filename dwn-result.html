@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Download Result</title>
+    <link rel="stylesheet" href="download-result.css" />
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar">
+        <a href="#" class="close-btn" onclick="toggleSidebar()">×</a>
+        <a href="index.html">Home</a>
+        <a href="pre-result.html">Previous Results</a>
+        <a href="dwn-result.html">Download Results</a>
+        <a href="contactus.html">Contact Us</a>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="menu" onclick="toggleSidebar()">&#9776;</div>
+        <div class="title">Download Result</div>
+        <div class="refresh">&#x21bb;</div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="filter-section">
+        <div class="filter-row">
+            <div class="filter-item">
+                <label for="fromDate">From:</label>
+                <input type="date" id="fromDate">
+            </div>
+            <div class="filter-item">
+                <label for="toDate">To:</label>
+                <input type="date" id="toDate">
+            </div>
+        </div>
+        <div class="search-button-row">
+            <button onclick="generateCSV()">Download CSV</button>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        function toggleSidebar() {
+            document.getElementById("sidebar").classList.toggle("active");
+        }
+    </script>
+    <script>
+        // Sample data (same structure as before)
+        const sampleResults = [
+            { date: '2025-06-01', time: '10:30 AM', game: 'Jackpot', result: '123' },
+            { date: '2025-06-01', time: '11:30 AM', game: 'Jackpot', result: '456' },
+            { date: '2025-06-02', time: '12:30 PM', game: 'Kerala', result: '789' },
+            { date: '2025-06-03', time: '03:30 PM', game: 'BSE', result: '321' },
+            { date: '2025-06-04', time: '05:30 PM', game: 'Dear Mor', result: '654' },
+            { date: '2025-06-05', time: '06:00 PM', game: 'Dear Eve', result: '987' },
+            { date: '2025-06-05', time: '08:00 PM', game: 'Dear Nig', result: '147' },
+        ];
+
+        function generateCSV() {
+            const fromDate = document.getElementById("fromDate").value;
+            const toDate = document.getElementById("toDate").value;
+
+            if (!fromDate || !toDate) {
+                alert("Please select both From and To dates.");
+                return;
+            }
+
+            const filtered = sampleResults.filter(item => {
+                return item.date >= fromDate && item.date <= toDate;
+            });
+
+            if (filtered.length === 0) {
+                alert("No data found for the selected date range.");
+                return;
+            }
+
+            let csvContent = "Date,Time,Game,Result\n";
+
+            filtered.forEach(item => {
+                csvContent += `${item.date},${item.time},${item.game},${item.result}\n`;
+            });
+
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `results_${fromDate}_to_${toDate}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+
+</body>
+
+</html>
