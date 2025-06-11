@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Star LED Border</title>
+  <style>
+    body {
+      margin: 0;
+      background: #000;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .border-container {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    .star {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: radial-gradient(circle, white 0%, currentColor 20%, transparent 60%);
+      opacity: 0.8;
+      filter: drop-shadow(0 0 4px currentColor)
+              drop-shadow(0 0 6px currentColor)
+              drop-shadow(0 0 20px currentColor);
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    .star.glow {
+      transform: scale(1.6);
+      opacity: 1;
+      filter: drop-shadow(0 0 8px currentColor)
+              drop-shadow(0 0 20px currentColor)
+              drop-shadow(0 0 40px currentColor);
+    }
+  </style>
+</head>
+<body>
+  <div class="border-container" id="border"></div>
+
+  <script>
+    const container = document.getElementById("border");
+    const stars = [];
+    const gap = 30;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    const starColors = ["#ff0000", "#ffa500", "#ffff00", "#00ff00", "#00ffff", "#0000ff", "#ff00ff"];
+
+    function createStar(x, y, color) {
+      const star = document.createElement("div");
+      star.className = "star";
+      star.style.left = `${x}px`;
+      star.style.top = `${y}px`;
+      star.style.color = color;
+      container.appendChild(star);
+      stars.push(star);
+    }
+
+    function randomColor() {
+      return starColors[Math.floor(Math.random() * starColors.length)];
+    }
+
+    // Build star border
+    for (let x = 0; x < width; x += gap) createStar(x, 0, randomColor());                   // Top
+    for (let y = gap; y < height; y += gap) createStar(width - 12, y, randomColor());       // Right
+    for (let x = width - gap; x > 0; x -= gap) createStar(x, height - 12, randomColor());   // Bottom
+    for (let y = height - gap; y > 0; y -= gap) createStar(0, y, randomColor());            // Left
+
+    // Glitter animation (multiple lights glowing randomly)
+    setInterval(() => {
+      stars.forEach(star => {
+        const glow = Math.random() > 0.6;
+        star.classList.toggle('glow', glow);
+      });
+    }, 150);
+  </script>
+</body>
+</html>
