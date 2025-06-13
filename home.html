@@ -34,19 +34,16 @@
       position: absolute;
       border-radius: 50%;
       background: radial-gradient(circle, white 0%, currentColor 20%, transparent 60%);
-      opacity: 0.8;
+      opacity: 0.6;
       filter: drop-shadow(0 0 4px currentColor)
-              drop-shadow(0 0 6px currentColor)
+              drop-shadow(0 0 10px currentColor)
               drop-shadow(0 0 20px currentColor);
-      transition: transform 0.3s ease, opacity 0.3s ease;
+      animation: blink 1.5s infinite ease-in-out;
     }
 
-    .star.glow {
-      transform: scale(1.5);
-      opacity: 1;
-      filter: drop-shadow(0 0 10px currentColor)
-              drop-shadow(0 0 20px currentColor)
-              drop-shadow(0 0 40px currentColor);
+    @keyframes blink {
+      0%, 100% { opacity: 0.5; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.4); }
     }
 
     .content {
@@ -83,14 +80,13 @@
   <div class="border-container" id="border">
     <div class="star-layer" id="starLayer"></div>
     <div class="content">
-      <h1>This border is strictly inside!</h1>
+      <h1>This border works perfectly on mobile!</h1>
       <button onclick="alert('Button works!')">Click Me</button>
     </div>
   </div>
 
   <script>
     const starLayer = document.getElementById("starLayer");
-    let stars = [];
     const starColors = ["#ff0000", "#ffa500", "#ffff00", "#00ff00", "#00ffff", "#0000ff", "#ff00ff"];
 
     function randomColor() {
@@ -105,13 +101,12 @@
       star.style.left = `${x - size / 2}px`;
       star.style.top = `${y - size / 2}px`;
       star.style.color = color;
+      star.style.animationDelay = `${Math.random() * 1.5}s`; // staggered glow
       starLayer.appendChild(star);
-      stars.push(star);
     }
 
     function generateStars() {
       starLayer.innerHTML = '';
-      stars = [];
 
       const width = window.innerWidth;
       const height = window.innerHeight;
@@ -141,20 +136,6 @@
     window.addEventListener('resize', () => {
       setTimeout(generateStars, 200);
     });
-
-    // Smooth blinking with requestAnimationFrame
-    let lastTime = 0;
-    function animate(time) {
-      if (time - lastTime > 200) {
-        stars.forEach(star => {
-          star.classList.toggle('glow', Math.random() > 0.6);
-        });
-        lastTime = time;
-      }
-      requestAnimationFrame(animate);
-    }
-
-    requestAnimationFrame(animate);
   </script>
 </body>
 
