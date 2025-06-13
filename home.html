@@ -1,91 +1,247 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Star LED Border Inside Screen</title>
+  <title>LED Border Layout</title>
   <style>
-    html,
-    body {
+    * {
       margin: 0;
-      padding: 0;
-      background: #000;
-      height: 100%;
-      width: 100%;
-      overflow: hidden;
-      font-family: sans-serif;
+      box-sizing: border-box;
     }
 
-    .border-container {
+    body {
+      background: #000;
+      color: white;
+      font-family: sans-serif;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      height: 100%;
+      width: 0;
       position: fixed;
-      inset: 0;
+      z-index: 1000;
+      top: 0;
+      left: 0;
+      background-color: #0e1a23;
+      overflow-x: hidden;
+      transition: 0.3s;
+      padding-top: 60px;
+    }
+
+    .sidebar a {
+      padding: 15px 25px;
+      text-decoration: none;
+      font-size: 20px;
+      color: #fff;
+      display: block;
+      transition: 0.3s;
+    }
+
+    .sidebar a:hover {
+      background-color: #1a3d4f;
+    }
+
+    .sidebar .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 36px;
+    }
+
+    .sidebar.active {
+      width: 250px;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(to bottom right, #0e1a23, #4d4d4d);
+      padding: 15px 20px;
+      font-size: 22px;
+      font-weight: bold;
+      position: relative;
       z-index: 10;
-      pointer-events: none;
+    }
+
+    .menu,
+    .refresh {
+      font-size: 26px;
+      cursor: pointer;
+    }
+
+    /* Border container with star effect */
+    .border-container {
+      position: relative;
+      z-index: 1;
+      height: calc(100vh - 60px); /* Leave space for header */
+      overflow: hidden;
     }
 
     .star-layer {
       position: absolute;
       inset: 0;
-      z-index: 1;
+      z-index: 0;
     }
 
+    .card-content-area {
+      position: relative;
+      z-index: 2;
+      height: 80%;
+      overflow-y: auto;
+      padding: 20px;
+      margin-top: 5%;
+    }
+
+    .header-container {
+      text-align: center;
+      color: red;
+      margin-bottom: 20px;
+    }
+
+    .main-content {
+      display: flex;
+      justify-content: center;
+    }
+
+    .card-columns {
+      display: flex;
+      width: 100%;
+      max-width: 1000px;
+      justify-content: center;
+      gap: 40px;
+    }
+
+    .left-column,
+    .right-column {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .card {
+      background: white;
+      color: black;
+      border-radius: 12px;
+      text-align: center;
+      padding: 20px;
+      width: 200px;
+      min-height: 80px;
+    }
+
+    .result-header {
+      color: red;
+      font-style: italic;
+      text-align: center;
+    }
+
+    /* Star glow animation */
     .star {
       position: absolute;
       border-radius: 50%;
       background: radial-gradient(circle, white 0%, currentColor 20%, transparent 60%);
       opacity: 0.6;
-      filter: drop-shadow(0 0 4px currentColor)
-              drop-shadow(0 0 10px currentColor)
-              drop-shadow(0 0 20px currentColor);
+      filter: drop-shadow(0 0 4px currentColor) drop-shadow(0 0 10px currentColor) drop-shadow(0 0 20px currentColor);
       animation: blink 1.5s infinite ease-in-out;
     }
 
     @keyframes blink {
-      0%, 100% { opacity: 0.5; transform: scale(1); }
-      50% { opacity: 1; transform: scale(1.4); }
+      0%, 100% {
+        opacity: 0.5;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1.4);
+      }
     }
 
-    .content {
-      position: relative;
-      z-index: 2;
-      text-align: center;
-      color: white;
-      top: 50%;
-      transform: translateY(-50%);
-      padding: 1rem;
-    }
+    @media (max-width: 600px) {
+      .card-columns {
+        flex-direction: row;
+        gap: 10px;
+      }
 
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-    }
+      .left-column,
+      .right-column {
+        gap: 10px;
+      }
 
-    button {
-      padding: 10px 20px;
-      background-color: #ffffff22;
-      border: 1px solid #fff;
-      color: white;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #ffffff44;
+      .card {
+        width: 150px;
+        padding: 16px;
+        font-size: 14px;
+      }
     }
   </style>
 </head>
-
 <body>
+
+  <!-- Sidebar -->
+  <div id="sidebar" class="sidebar">
+    <a href="#" class="close-btn" onclick="toggleSidebar()">×</a>
+    <a href="index.html">Home</a>
+    <a href="pre-result.html">Previous Results</a>
+    <a href="dwn-result.html">Download Results</a>
+  </div>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="menu" onclick="toggleSidebar()">&#9776;</div>
+    <div class="title">Today</div>
+    <div class="refresh">&#x21bb;</div>
+  </div>
+
+  <!-- LED border container -->
   <div class="border-container" id="border">
     <div class="star-layer" id="starLayer"></div>
-    <div class="content">
-      <h1>This border works perfectly on mobile!</h1>
-      <button onclick="alert('Button works!')">Click Me</button>
+
+    <div class="card-content-area">
+      <div class="header-container">
+        <h1 class="main-header">DEARMC</h1>
+      </div>
+
+      <div class="main-content">
+        <div class="card-columns">
+          <!-- LEFT COLUMN -->
+          <div class="left-column">
+            <h2 class="result-header">MC NUMBER</h2>
+            <div class="card"><h3>10:00 am</h3><br><h2>1234</h2></div>
+            <div class="card"><h3>11:00 am</h3><br><h2>1234</h2></div>
+            <div class="card"><h3>12:00 pm</h3><br><h2>1234</h2></div>
+            <div class="card"><h3>01:00 pm</h3><br><h2>1234</h2></div>
+            <div class="card"><h3>02:00 pm</h3><br><h2>1234</h2></div>
+            <div class="card"><h3>03:00 pm</h3><br><h2>1234</h2></div>
+            <div class="card"><h3>04:00 pm</h3><br><h2>1234</h2></div>
+            <div class="card"><h3>05:00 pm</h3><br><h2>1234</h2></div>
+          </div>
+
+          <!-- RIGHT COLUMN -->
+          <div class="right-column">
+            <h2 class="result-header">RESULT</h2>
+            <div class="card"><h3>10:00 am</h3><br><h2>---</h2></div>
+            <div class="card"><h3>11:00 am</h3><br><h2>---</h2></div>
+            <div class="card"><h3>12:00 pm</h3><br><h2>---</h2></div>
+            <div class="card"><h3>01:00 pm</h3><br><h2>---</h2></div>
+            <div class="card"><h3>02:00 pm</h3><br><h2>---</h2></div>
+            <div class="card"><h3>03:00 pm</h3><br><h2>---</h2></div>
+            <div class="card"><h3>04:00 pm</h3><br><h2>---</h2></div>
+            <div class="card"><h3>05:00 pm</h3><br><h2>---</h2></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
+    function toggleSidebar() {
+      document.getElementById("sidebar").classList.toggle("active");
+    }
+
     const starLayer = document.getElementById("starLayer");
     const starColors = ["#ff0000", "#ffa500", "#ffff00", "#00ff00", "#00ffff", "#0000ff", "#ff00ff"];
 
@@ -101,42 +257,26 @@
       star.style.left = `${x - size / 2}px`;
       star.style.top = `${y - size / 2}px`;
       star.style.color = color;
-      star.style.animationDelay = `${Math.random() * 1.5}s`; // staggered glow
+      star.style.animationDelay = `${Math.random() * 2}s`;
       starLayer.appendChild(star);
     }
 
     function generateStars() {
       starLayer.innerHTML = '';
-
       const width = window.innerWidth;
-      const height = window.innerHeight;
+      const height = document.querySelector(".border-container").clientHeight;
       const gap = Math.max(24, Math.min(width, height) / 15);
       const starSize = Math.max(6, Math.min(width, height) / 30);
       const margin = starSize / 2 + 2;
 
-      // Top
-      for (let x = margin; x <= width - margin; x += gap) {
-        createStar(x, margin, randomColor(), starSize);
-      }
-      // Right
-      for (let y = gap + margin; y <= height - margin; y += gap) {
-        createStar(width - margin, y, randomColor(), starSize);
-      }
-      // Bottom
-      for (let x = width - gap - margin; x >= margin; x -= gap) {
-        createStar(x, height - margin, randomColor(), starSize);
-      }
-      // Left
-      for (let y = height - gap - margin; y >= margin; y -= gap) {
-        createStar(margin, y, randomColor(), starSize);
-      }
+      for (let x = margin; x <= width - margin; x += gap) createStar(x, margin, randomColor(), starSize);
+      for (let y = gap + margin; y <= height - margin; y += gap) createStar(width - margin, y, randomColor(), starSize);
+      for (let x = width - gap - margin; x >= margin; x -= gap) createStar(x, height - margin, randomColor(), starSize);
+      for (let y = height - gap - margin; y >= margin; y -= gap) createStar(margin, y, randomColor(), starSize);
     }
 
     window.addEventListener('DOMContentLoaded', generateStars);
-    window.addEventListener('resize', () => {
-      setTimeout(generateStars, 200);
-    });
+    window.addEventListener('resize', () => setTimeout(generateStars, 200));
   </script>
 </body>
-
 </html>
