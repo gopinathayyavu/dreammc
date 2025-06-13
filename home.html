@@ -117,21 +117,21 @@
       const height = window.innerHeight;
       const gap = Math.max(24, Math.min(width, height) / 15);
       const starSize = Math.max(6, Math.min(width, height) / 30);
-      const margin = starSize / 2 + 2; // keeps stars inside the screen
+      const margin = starSize / 2 + 2;
 
-      // Top (inside top edge)
+      // Top
       for (let x = margin; x <= width - margin; x += gap) {
         createStar(x, margin, randomColor(), starSize);
       }
-      // Right (inside right edge)
+      // Right
       for (let y = gap + margin; y <= height - margin; y += gap) {
         createStar(width - margin, y, randomColor(), starSize);
       }
-      // Bottom (inside bottom edge)
+      // Bottom
       for (let x = width - gap - margin; x >= margin; x -= gap) {
         createStar(x, height - margin, randomColor(), starSize);
       }
-      // Left (inside left edge)
+      // Left
       for (let y = height - gap - margin; y >= margin; y -= gap) {
         createStar(margin, y, randomColor(), starSize);
       }
@@ -142,12 +142,19 @@
       setTimeout(generateStars, 200);
     });
 
-    setInterval(() => {
-      stars.forEach(star => {
-        const glow = Math.random() > 0.6;
-        star.classList.toggle('glow', glow);
-      });
-    }, 150);
+    // Smooth blinking with requestAnimationFrame
+    let lastTime = 0;
+    function animate(time) {
+      if (time - lastTime > 200) {
+        stars.forEach(star => {
+          star.classList.toggle('glow', Math.random() > 0.6);
+        });
+        lastTime = time;
+      }
+      requestAnimationFrame(animate);
+    }
+
+    requestAnimationFrame(animate);
   </script>
 </body>
 
