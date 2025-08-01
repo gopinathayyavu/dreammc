@@ -26,6 +26,7 @@ header h1 {
     font-size: 2.2rem;
     background: linear-gradient(90deg, #00f0ff, #ff00c8);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     letter-spacing: 1px;
 }
@@ -78,6 +79,7 @@ header h1 {
     background-size: 400% 400%;
     animation: borderRoll 8s linear infinite;
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     z-index: 1;
