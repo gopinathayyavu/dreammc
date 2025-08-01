@@ -29,6 +29,16 @@ function createCard(slot, type) {
   return card;
 }
 
+function displayBoxes(container, text) {
+  container.innerHTML = '';
+  [...text].forEach(char => {
+    const box = document.createElement('div');
+    box.className = 'number-box';
+    box.textContent = char;
+    container.appendChild(box);
+  });
+}
+
 function renderTodayCards() {
   const today = new Date();
   const todayPath = formatDateForPath(today);
@@ -39,38 +49,30 @@ function renderTodayCards() {
     const machineTime = new Date(slotTime);
     machineTime.setHours(machineTime.getHours() - 1);
 
-    const mcCard = createCard(slot, "mc");
-    const rsCard = createCard(slot, "rs");
+    const mcCard = createCard(slot, 'mc');
+    const rsCard = createCard(slot, 'rs');
 
     machineCol.appendChild(mcCard);
     resultCol.appendChild(rsCard);
 
     const refPath = ref(db, `lottery/${todayPath}/${slot}`);
     onValue(refPath, snapshot => {
-      const data = snapshot.val();
-      const mcBox = document.getElementById(`mc-${slot}`);
-      const rsBox = document.getElementById(`rs-${slot}`);
-      if (!mcBox || !rsBox) return;
+      try {
+        const data = snapshot.val() || {};
+        const mcBox = document.getElementById(`mc-${slot}`);
+        const rsBox = document.getElementById(`rs-${slot}`);
+        if (!mcBox || !rsBox) return;
 
-      // Machine number logic
-      mcBox.innerHTML = '';
-      const mcDigits = (now >= machineTime && data?.machine) ? data.machine : '-----';
-      [...mcDigits].forEach(d => {
-        const box = document.createElement('div');
-        box.className = 'number-box';
-        box.textContent = d;
-        mcBox.appendChild(box);
-      });
+        const mcText = (now >= machineTime && data.machine) ? data.machine : '-----';
+        const rsText = (now >= slotTime && data.result) ? data.result : '-----';
 
-      // Result logic
-      rsBox.innerHTML = '';
-      const rsDigits = (now >= slotTime && data?.result) ? data.result : '-----';
-      [...rsDigits].forEach(d => {
-        const box = document.createElement('div');
-        box.className = 'number-box';
-        box.textContent = d;
-        rsBox.appendChild(box);
-      });
+        displayBoxes(mcBox, mcText);
+        displayBoxes(rsBox, rsText);
+      } catch (error) {
+        console.error(`Error reading data for ${slot}:`, error);
+      }
+    }, error => {
+      console.error(`Firebase read error for slot ${slot}:`, error);
     });
   });
 }
