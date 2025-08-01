@@ -4,270 +4,157 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LED Border Layout</title>
+  <title>DEAR MC - Live Draw</title>
   <style>
+    :root {
+      --card-width: clamp(280px, 30vw, 360px);
+      --box-size: clamp(48px, 5vw, 66px);
+      --box-font: clamp(1.6rem, 2.5vw, 2.4rem);
+    }
+
     * {
-      margin: 0;
       box-sizing: border-box;
     }
 
+    html {
+      font-size: 100%;
+    }
+
     body {
-      background: #000;
-      color: white;
-      font-family: sans-serif;
-      overflow: hidden;
-    }
-
-    /* Sidebar */
-    .sidebar {
-      height: 100%;
-      width: 0;
-      position: fixed;
-      z-index: 1000;
-      top: 0;
-      left: 0;
-      background-color: #0e1a23;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #ffffff, #f2faff);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1a1a1a;
       overflow-x: hidden;
-      transition: 0.3s;
-      padding-top: 60px;
     }
 
-    .sidebar a {
-      padding: 15px 25px;
-      text-decoration: none;
-      font-size: 20px;
-      color: #fff;
-      display: block;
-      transition: 0.3s;
+    header {
+      text-align: center;
+      padding: 30px 10px 10px;
     }
 
-    .sidebar a:hover {
-      background-color: #1a3d4f;
+    header h1 {
+      font-size: 2.4rem;
+      background: -webkit-linear-gradient(#00f0ff, #ff0080);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
-    .sidebar .close-btn {
-      position: absolute;
-      top: 10px;
-      right: 20px;
-      font-size: 36px;
-    }
-
-    .sidebar.active {
-      width: 250px;
-    }
-
-    /* Header */
-    .header {
+    .label-bar {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      background: linear-gradient(to bottom right, #0e1a23, #4d4d4d);
-      padding: 15px 20px;
-      font-size: 22px;
+      padding: 15px 30px;
       font-weight: bold;
-      position: relative;
-      z-index: 10;
+      font-size: 1.25rem;
+      max-width: 960px;
+      margin: auto;
     }
 
-    .menu,
-    .refresh {
-      font-size: 26px;
-      cursor: pointer;
-    }
-
-    /* Border container with star effect */
-    .border-container {
-      overflow: auto;
-      height: 500px;
-      margin-bottom: 5%;
-    }
-
-    .card-content-area {
-      position: relative;
-      z-index: 2;
-      height: 80%;
-      overflow-y: auto;
-      padding: 20px;
-      margin-top: 3%;
-    }
-
-    .header-container {
-      text-align: center;
-      color: red;
-      margin-bottom: 20px;
-    }
-
-    .main-content {
+    .cards-wrapper {
       display: flex;
-      justify-content: center;
-    }
-
-    .card-columns {
-      display: flex;
-      width: 100%;
-      max-width: 1000px;
       justify-content: center;
       gap: 40px;
+      padding: 0 20px 60px;
+      max-width: 100%;
     }
 
-    .left-column,
-    .right-column {
+    .card-column {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 20px;
+      align-items: center;
     }
 
     .card {
-      background: white;
-      color: black;
-      border-radius: 12px;
-      text-align: center;
+      width: var(--card-width);
+      background-color: #ffffff;
       padding: 20px;
-      width: 200px;
-      min-height: 80px;
+      border-radius: 12px;
+      position: relative;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
-    .card-columns-header {
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      padding: 2px;
+      border-radius: 12px;
+      background: linear-gradient(45deg, #00f0ff, #ff00d4, #00f0ff);
+      background-size: 600% 600%;
+      animation: borderRoll 10s linear infinite;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      z-index: 1;
+    }
+
+    @keyframes borderRoll {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    .card h3 {
+      position: relative;
+      z-index: 2;
+      font-size: 1.5rem;
+      margin-bottom: 15px;
+      color: #222;
+    }
+
+    .number-boxes {
+      position: relative;
+      z-index: 2;
       display: flex;
       justify-content: center;
-      gap: 40px;
-      margin-bottom: 10px;
+      gap: 10px;
+      flex-wrap: wrap;
     }
 
-    .card-columns-header .result-header {
-      width: 200px;
-      text-align: center;
-      color: red;
-      font-style: italic;
-    }
-
-
-    @media (max-width: 600px) {
-      .card-columns {
-        flex-direction: row;
-        gap: 10px;
-      }
-
-      .left-column,
-      .right-column {
-        gap: 10px;
-      }
-
-      .card {
-        width: 150px;
-        padding: 16px;
-        font-size: 14px;
-      }
+    .number-box {
+      background: #f2faff;
+      color: #222;
+      width: var(--box-size);
+      height: var(--box-size);
+      font-size: var(--box-font);
+      font-weight: bold;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   </style>
+
+  <script type="module" src="firebase-init.js" defer></script>
+  <script type="module" src="home.js" defer></script>
 </head>
 
 <body>
-
-  <!-- Sidebar -->
-  <div id="sidebar" class="sidebar">
-    <a href="#" class="close-btn" onclick="toggleSidebar()">×</a>
-    <a href="index.html">Home</a>
-    <a href="pre-result.html">Previous Results</a>
-    <a href="dwn-result.html">Download Results</a>
+  <header>
+    <h1>DEAR MC LIVE DRAW</h1>
+  </header>
+  <div class="label-bar">
+    <div>MC NUMBER</div>
+    <div>RESULT</div>
   </div>
-
-  <!-- Header -->
-  <div class="header">
-    <div class="menu" onclick="toggleSidebar()">&#9776;</div>
-    <div class="title">Today</div>
-    <div class="refresh">&#x21bb;</div>
+  <div class="cards-wrapper">
+    <div class="card-column" id="machine-column"></div>
+    <div class="card-column" id="result-column"></div>
   </div>
-
-  <!-- LED border container -->
-
-  <div class="card-content-area">
-    <div class="header-container">
-      <h1 class="main-header">DEARMC</h1><br>
-      <div class="card-columns-header">
-        <h2 class="result-header">MC NUMBER</h2>
-        <h2 class="result-header">RESULT</h2>
-      </div>
-    </div>
-    <div class="border-container" id="border">
-      <div class="main-content">
-        <div class="card-columns">
-          <!-- LEFT COLUMN -->
-          <div class="left-column">
-            <div class="card">
-              <h3>10:00 am</h3><br>
-              <h2>1234</h2>
-            </div>
-            <div class="card">
-              <h3>11:00 am</h3><br>
-              <h2>1234</h2>
-            </div>
-            <div class="card">
-              <h3>12:00 pm</h3><br>
-              <h2>1234</h2>
-            </div>
-            <div class="card">
-              <h3>01:00 pm</h3><br>
-              <h2>1234</h2>
-            </div>
-            <div class="card">
-              <h3>02:00 pm</h3><br>
-              <h2>1234</h2>
-            </div>
-            <div class="card">
-              <h3>03:00 pm</h3><br>
-              <h2>1234</h2>
-            </div>
-            <div class="card">
-              <h3>04:00 pm</h3><br>
-              <h2>1234</h2>
-            </div>
-            <div class="card">
-              <h3>05:00 pm</h3><br>
-              <h2>1234</h2>
-            </div>
-          </div>
-
-          <!-- RIGHT COLUMN -->
-          <div class="right-column">
-            <div class="card">
-              <h3>10:00 am</h3><br>
-              <h2>---</h2>
-            </div>
-            <div class="card">
-              <h3>11:00 am</h3><br>
-              <h2>---</h2>
-            </div>
-            <div class="card">
-              <h3>12:00 pm</h3><br>
-              <h2>---</h2>
-            </div>
-            <div class="card">
-              <h3>01:00 pm</h3><br>
-              <h2>---</h2>
-            </div>
-            <div class="card">
-              <h3>02:00 pm</h3><br>
-              <h2>---</h2>
-            </div>
-            <div class="card">
-              <h3>03:00 pm</h3><br>
-              <h2>---</h2>
-            </div>
-            <div class="card">
-              <h3>04:00 pm</h3><br>
-              <h2>---</h2>
-            </div>
-            <div class="card">
-              <h3>05:00 pm</h3><br>
-              <h2>---</h2>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
 </body>
 
 </html>
