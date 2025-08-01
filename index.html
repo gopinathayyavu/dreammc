@@ -7,8 +7,86 @@
   <link rel="stylesheet" href="index.css">
   <script type="module" src="firebase-init.js" defer></script>
   <script type="module" src="home.js" defer></script>
+  <style>
+    .menu-icon {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      width: 30px;
+      height: 25px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      z-index: 1100;
+    }
+    .menu-icon span {
+      height: 4px;
+      background-color: #333;
+      border-radius: 2px;
+    }
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 250px;
+      height: 100%;
+      background: linear-gradient(135deg, #f0f8ff, #e6e6fa);
+      box-shadow: 4px 0 12px rgba(0, 0, 0, 0.1);
+      padding: 60px 20px;
+      transition: left 0.3s ease;
+      z-index: 1000;
+    }
+    .sidebar.active {
+      left: 0;
+    }
+    .sidebar a {
+      display: block;
+      padding: 12px;
+      color: #333;
+      text-decoration: none;
+      margin-bottom: 10px;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+    .sidebar a:hover {
+      background-color: #ddd;
+    }
+    .sidebar .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 24px;
+      cursor: pointer;
+      color: #333;
+    }
+    header {
+      text-align: center;
+      padding: 30px 10px 10px;
+    }
+    header h1 {
+      font-size: 2.4rem;
+      background: -webkit-linear-gradient(#00f0ff, #ff0080);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  </style>
 </head>
 <body>
+  <div class="menu-icon" onclick="document.querySelector('.sidebar').classList.add('active')">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+
+  <div class="sidebar">
+    <span class="close-btn" onclick="document.querySelector('.sidebar').classList.remove('active')">&times;</span>
+    <a href="index">Home</a>
+    <a href="result">Result Chart</a>
+    <a href="mcchart">MC Chart</a>
+    <a href="contact">Contact</a>
+  </div>
+
   <header>
     <h1>DEAR MC</h1>
   </header>
