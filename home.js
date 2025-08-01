@@ -25,7 +25,7 @@ function parseSlotTime(slot) {
 function createCard(slot, type) {
   const card = document.createElement('div');
   card.className = 'card';
-  card.innerHTML = `<h3>${slot}</h3><div class="number-boxes" id="${type}-${slot}"></div>`;
+  card.innerHTML = `<h4>${slot}</h4><div class="number-boxes" id="${type}-${slot}"></div>`;
   return card;
 }
 

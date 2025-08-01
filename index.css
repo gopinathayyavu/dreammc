@@ -97,7 +97,7 @@ header h1 {
     }
 }
 
-.card h3 {
+.card h4 {
     position: relative;
     z-index: 2;
     font-size: 1.1rem;
@@ -117,20 +117,6 @@ header h1 {
     /* default */
 }
 
-@media (max-width: 768px) {
-    .number-boxes {
-        flex-direction: row;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .number-box {
-        width: 18px !important;
-        height: 20px !important;
-        font-size: 12px !important;
-    }
-}
-
 
 .number-box {
     background: #f2faff;
@@ -145,3 +131,30 @@ header h1 {
     align-items: center;
     justify-content: center;
 }
+
+@media (max-width: 768px) {
+    .card {
+        height: 15vh;
+    }
+    .number-boxes {
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .number-box {
+        width: 18px !important;
+        height: 50px !important;
+        font-size: 20px !important;
+        border-radius: 5px;
+    }
+
+    .card h4 {
+        position: relative;
+        z-index: 2;
+        font-size: 13px;
+        margin-bottom: 12px;
+        color: #222;
+    }
+}
+
