@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MC Image</title>
+    <style>
+        body {
+            margin: 0;
+            text-align: center;
+            color: white;
+            height: 90vh;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e7f8ff, #ffffff);
+            color: #222;
+            overflow-x: hidden;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #7bc4e4, #ffffff);
+        }
+
+
+        #image-container {
+            position: relative;
+            width: 90vw;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        #template-img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .overlay {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            color: b;
+            font-weight: bold;
+            font-family: 'Arial Black', sans-serif;
+            text-shadow: 2px 2px 5px white;
+        }
+
+        #date-text {
+            top: 25%;
+            font-size: 1.4rem;
+            color: white;
+            text-shadow:
+                -1px -1px 0 red,
+                1px -1px 0 red,
+                -1px 1px 0 red,
+                1px 1px 0 red;
+        }
+
+        #time-text {
+            top: 30%;
+            font-size: 1.8rem;
+            color: white;
+            text-shadow:
+                -1px -1px 0 red,
+                1px -1px 0 red,
+                -1px 1px 0 red,
+                1px 1px 0 red;
+        }
+
+        .container {
+            margin-top: 5%;
+        }
+
+        .heading {
+            font-size: 2.5rem;
+            font-weight: 700;
+            font-family: 'Poppins', 'Segoe UI', sans-serif;
+            color: #222;
+            margin-bottom: 24px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow:
+                1px 1px 3px rgba(0, 0, 0, 0.2),
+                2px 2px 5px rgba(0, 0, 0, 0.05);
+            background: linear-gradient(90deg, #ff8a00, #e52e71);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            padding: 10px 0;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .digit {
+                font-size: 3rem !important;
+            }
+
+            #date-text {
+                top: 25%;
+                font-size: 1.2rem;
+            }
+
+            #time-text {
+                top: 30%;
+                font-size: 1rem;
+            }
+
+            .container {
+                margin-top: 10%;
+            }
+        }
+
+        @media (max-width: 468px) {
+            .digit {
+                font-size: 2.5rem !important;
+            }
+
+            #date-text {
+                top: 21%;
+                font-size: 1.2rem;
+            }
+
+            #time-text {
+                top: 29%;
+                font-size: 1rem;
+            }
+
+            .container {
+                margin-top: 15%;
+            }
+        }
+
+        @media (max-width: 368px) {
+            .digit {
+                font-size: 2rem !important;
+            }
+
+            #date-text {
+                top: 21%;
+                font-size: 1.2rem;
+            }
+
+            #time-text {
+                top: 29%;
+                font-size: 1rem;
+            }
+
+            .container {
+                margin-top: 20%;
+            }
+        }
+
+
+        .digit {
+            font-size: 4rem;
+            position: absolute;
+            top: 58%;
+            transform: translate(-50%, -50%);
+            text-shadow: 2px 2px 5px black;
+            color: black;
+            font-family: 'Arial Black', sans-serif;
+        }
+
+        /* Adjust these left positions to match your actual slot positions visually */
+        #digit-1 {
+            left: 29%;
+        }
+
+        #digit-2 {
+            left: 39%;
+        }
+
+        #digit-3 {
+            left: 49.5%;
+        }
+
+        #digit-4 {
+            left: 59.7%;
+        }
+
+        #digit-5 {
+            left: 70%;
+        }
+
+        button {
+            margin-top: 30px;
+            padding: 12px 24px;
+            font-size: 1.2rem;
+            border: none;
+            background: #00cfff;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #00a4cc;
+        }
+
+        .ticker-container {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #222;
+            color: white;
+            height: 40px;
+            align-items: center;
+        }
+
+        .ticker-text {
+            display: inline-block;
+            white-space: nowrap;
+            padding-left: 100%;
+            animation: ticker 15s linear infinite;
+            font-size: 18px;
+        }
+
+        .ticker-text a {
+            color: #00f0ff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        @keyframes ticker {
+            0% {
+                transform: translateX(0%);
+            }
+
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+
+        .menu-icon {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 30px;
+            height: 25px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            z-index: 1100;
+        }
+
+        .menu-icon span {
+            height: 4px;
+            background-color: #333;
+            border-radius: 2px;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -250px;
+            width: 250px;
+            height: 100%;
+            background: linear-gradient(135deg, #f0f8ff, #e6e6fa);
+            box-shadow: 4px 0 12px rgba(0, 0, 0, 0.1);
+            padding: 60px 20px;
+            transition: left 0.3s ease;
+            z-index: 1000;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 12px;
+            color: #333;
+            text-decoration: none;
+            margin-bottom: 10px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .sidebar a:hover {
+            background-color: #ddd;
+        }
+
+        .sidebar .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="menu-icon" onclick="document.querySelector('.sidebar').classList.add('active')">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <div class="sidebar">
+        <span class="close-btn" onclick="document.querySelector('.sidebar').classList.remove('active')">&times;</span>
+        <a href="index">Home</a>
+        <a href="result">Result Chart</a>
+        <a href="mcchart">MC Chart</a>
+        <a href="mc">MC</a>
+    </div>
+    <div class="container">
+        <h2 class="heading">Dear MC - Machine Number</h2>
+
+        <div id="image-container">
+            <img id="template-img" src="./images/final.png" alt="MC Template" />
+
+            <div class="overlay" id="date-text"></div>
+            <div class="overlay" id="time-text"></div>
+
+            <!-- 5 Digit Overlays -->
+            <div class="digit" id="digit-1">0</div>
+            <div class="digit" id="digit-2">0</div>
+            <div class="digit" id="digit-3">0</div>
+            <div class="digit" id="digit-4">0</div>
+            <div class="digit" id="digit-5">0</div>
+        </div>
+
+        <button onclick="downloadImage()">Download</button>
+    </div>
+
+    <div class="ticker-container">
+        <div class="ticker-text">
+            🚨 Check out our latest updates at <a href="https://example.com" target="_blank">https://dearmc.com</a> —
+            Stay tuned for more news! 🚨
+        </div>
+    </div>
+
+    <script type="module">
+        import { db } from './firebase-init.js';
+        import { ref, onValue } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js';
+
+        const timeSlots = ['10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM', '05:00 PM'];
+        const resultHours = [10, 11, 12, 13, 14, 15, 16, 17];
+
+        const dateEl = document.getElementById('date-text');
+        const timeEl = document.getElementById('time-text');
+
+        const now = new Date();
+        const currentHour = now.getHours();
+
+        const today = now.toISOString().split('T')[0];
+        const showSlotIndex = resultHours.findIndex(hour => currentHour < hour);
+
+        if (showSlotIndex > 0) {
+            const slot = timeSlots[showSlotIndex];
+            const hour = resultHours[showSlotIndex];
+
+            const displayDate = today;
+            const refPath = ref(db, `lottery/${displayDate}/${slot}`);
+
+            dateEl.textContent = displayDate;
+            timeEl.textContent = `D-${slot}`;
+
+            onValue(refPath, (snapshot) => {
+                const data = snapshot.val();
+                if (data && data.machine && data.machine.length === 5) {
+                    for (let i = 0; i < 5; i++) {
+                        const digitEl = document.getElementById(`digit-${i + 1}`);
+                        digitEl.textContent = data.machine[i];
+                    }
+                } else {
+                    for (let i = 1; i <= 5; i++) {
+                        document.getElementById(`digit-${i}`).textContent = '0';
+                    }
+                }
+            });
+        } else {
+            dateEl.textContent = today;
+            timeEl.textContent = 'No upcoming MC';
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById(`digit-${i}`).textContent = '0';
+            }
+        }
+
+        // Download image
+        window.downloadImage = async function () {
+            const container = document.getElementById('image-container');
+            const canvas = await html2canvas(container);
+            const link = document.createElement('a');
+            link.download = 'mc-number.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+</body>
+
+</html>
