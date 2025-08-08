@@ -190,8 +190,8 @@
         import { db } from './firebase-init.js';
         import { ref, onValue } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js';
 
-        const timeSlots = ["10:00 AM", "11:00 AM", "12:00 PM", "01:00 PM", "02:00 PM", "03:00 PM", "04:00 PM", "05:00 PM"];
-        const resultTimes = [10, 11, 12, 13, 14, 15, 16, 17]; // 24-hour format
+        const timeSlots = ['10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '05:00 PM', '06:00 PM', '07:00 PM', '08:00 PM'];
+        const resultTimes = [10, 11, 12, 13, 17, 18, 19, 20]; // 24-hour format
 
         const mcBody = document.getElementById('mc-body');
         const rootRef = ref(db, 'lottery');

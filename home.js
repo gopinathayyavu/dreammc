@@ -2,7 +2,7 @@
 import { db } from './firebase-init.js';
 import { ref, onValue } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js';
 
-const timeSlots = ['10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM', '05:00 PM'];
+const timeSlots = ['10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '05:00 PM', '06:00 PM', '07:00 PM', '08:00 PM'];
 const machineCol = document.getElementById('machine-column');
 const resultCol = document.getElementById('result-column');
 

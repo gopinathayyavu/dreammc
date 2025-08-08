@@ -10,7 +10,7 @@
             margin: 0;
             text-align: center;
             color: white;
-            height: 90vh;
+            height: 100vh !important;
         }
 
         * {
@@ -75,7 +75,7 @@
         }
 
         .container {
-            margin-top: 5%;
+            margin-top: 0%;
         }
 
         .heading {
@@ -104,13 +104,15 @@
             }
 
             #date-text {
-                top: 23%;
-                font-size: 1.5rem;
+                top: 21%;
+                font-size: 1.3rem;
+                margin-left: -1%;
             }
 
             #time-text {
                 top: 29%;
-                font-size: 1.3rem;
+                font-size: 1rem;
+                margin-left: -2%;
             }
 
             .container {
@@ -120,7 +122,7 @@
 
         @media (max-width: 468px) {
             .digit {
-                font-size: 2.5rem !important;
+                font-size: 2rem !important;
             }
 
             #date-text {
@@ -140,7 +142,7 @@
 
         @media (max-width: 368px) {
             .digit {
-                font-size: 2rem !important;
+                font-size: 1.5rem !important;
             }
 
             #date-text {
@@ -162,7 +164,7 @@
         .digit {
             font-size: 4rem;
             position: absolute;
-            top: 58%;
+            top: 60%;
             transform: translate(-50%, -50%);
             text-shadow: 2px 2px 5px black;
             color: black;
@@ -171,15 +173,15 @@
 
         /* Adjust these left positions to match your actual slot positions visually */
         #digit-1 {
-            left: 29%;
+            left: 27.5%;
         }
 
         #digit-2 {
-            left: 39%;
+            left: 38%;
         }
 
         #digit-3 {
-            left: 49.5%;
+            left: 49%;
         }
 
         #digit-4 {
@@ -341,7 +343,7 @@
         </div>
     </div>
 
-    <script type="module">
+    <!-- <script type="module">
         import { db } from './firebase-init.js';
         import { ref, onValue } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js';
 
@@ -383,6 +385,81 @@
         } else {
             dateEl.textContent = today;
             timeEl.textContent = 'No upcoming MC';
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById(`digit-${i}`).textContent = '0';
+            }
+        }
+
+        // Download image
+        window.downloadImage = async function () {
+            const container = document.getElementById('image-container');
+            const canvas = await html2canvas(container);
+            const link = document.createElement('a');
+            link.download = 'mc-number.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+    </script> -->
+
+    <script type="module">
+        import { db } from './firebase-init.js';
+        import { ref, onValue } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js';
+
+        const timeSlots = ['10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '05:00 PM', '06:00 PM', '07:00 PM', '08:00 PM'];
+        const resultHours = [10, 11, 12, 13, 17, 18, 19, 20];
+
+        const dateEl = document.getElementById('date-text');
+        const timeEl = document.getElementById('time-text');
+
+        const now = new Date();
+        const todayDateStr = now.toISOString().split('T')[0];
+
+
+        // Function to parse slot string into Date object for today
+        function getSlotDateTime(slot) {
+            const [time, period] = slot.split(' ');
+            let [hour, minute] = time.split(':').map(Number);
+            if (period === 'PM' && hour !== 12) hour += 12;
+            if (period === 'AM' && hour === 12) hour = 0;
+            return new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute, 0);
+        }
+
+        // Find the correct slot (machine release = slot time - 1 hour)
+        let selectedSlotIndex = -1;
+        for (let i = timeSlots.length - 1; i >= 0; i--) {
+            const slotTime = getSlotDateTime(timeSlots[i]);
+            const releaseTime = new Date(slotTime.getTime() - 60 * 60 * 1000); // minus 1 hr
+            if (now >= releaseTime) {
+                selectedSlotIndex = i;
+                break;
+            }
+        }
+
+        if (selectedSlotIndex >= 0) {
+            const slot = timeSlots[selectedSlotIndex];
+            const refPath = ref(db, `lottery/${todayDateStr}/${slot}`);
+
+            dateEl.textContent = todayDateStr;
+            timeEl.textContent = `D-${slot}`;
+
+            onValue(refPath, (snapshot) => {
+                const data = snapshot.val();
+                if (data && data.machine && data.machine.length === 5) {
+                    for (let i = 0; i < 5; i++) {
+                        const digitEl = document.getElementById(`digit-${i + 1}`);
+                        digitEl.textContent = data.machine[i];
+                    }
+                } else {
+                    for (let i = 1; i <= 5; i++) {
+                        document.getElementById(`digit-${i}`).textContent = '0';
+                    }
+                }
+            });
+
+        } else {
+            // Before first slot release
+            dateEl.textContent = todayDateStr;
+            timeEl.textContent = 'No MC Yet';
             for (let i = 1; i <= 5; i++) {
                 document.getElementById(`digit-${i}`).textContent = '0';
             }
