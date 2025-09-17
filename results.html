@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DEAR Lottery – Live Result (Auto schedule)</title>
+  <link rel="stylesheet" href="results.css" />
+
+
+</head>
+
+<body>
+  <div class="stage">
+    <div class="frame">
+      <img src="dearmc6.png" alt="DEAR Lottery Frame" />
+
+      <!-- Banners -->
+      <div class="banner-live" id="banner-live">—</div>
+      <div class="banner-weekly" id="banner-weekly">—</div>
+
+      <div class="info-bar3">
+        <div class="info-chip" id="draw-time-left">--</div>
+      </div>
+
+      <div id="reels">
+        <span class="digit" id="d0">0</span>
+        <span class="digit" id="d1">0</span>
+        <span class="digit" id="d2">0</span>
+        <span class="digit" id="d3">0</span>
+        <span class="digit" id="d4">0</span>
+      </div>
+
+      <div class="info-bar1">
+        <div class="info-chip" id="draw-date">--</div>
+      </div>
+      <div class="info-bar2">
+        <div class="info-chip" id="draw-time">--</div>
+      </div>
+      <div class="countdown" id="countdown">--:--:--</div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB7WHatcQ3QsHcoQqxAY2rJ4XVjVLY4CYQ",
+      authDomain: "dearmc-7bcee.firebaseapp.com",
+      databaseURL: "https://dearmc-7bcee-default-rtdb.firebaseio.com",
+      projectId: "dearmc-7bcee",
+      storageBucket: "dearmc-7bcee.appspot.com",
+      messagingSenderId: "690002837359",
+      appId: "1:690002837359:web:4046447df9b969c881f29a",
+      measurementId: "G-7G5928KRZ1"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const digits = ["d0", "d1", "d2", "d3", "d4"].map(id => document.getElementById(id));
+    const drawDateEl = document.getElementById("draw-date");
+    const drawTimeEl = document.getElementById("draw-time");
+    const drawTimeLeftEl = document.getElementById("draw-time-left");
+    const countdownEl = document.getElementById("countdown");
+    const liveEl = document.getElementById("banner-live");
+    const weeklyEl = document.getElementById("banner-weekly");
+
+    const TIMEZONE = "Asia/Kolkata";
+    const SPIN_WINDOW_MS = 5 * 60 * 1000;
+    const SLOTS = ['10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '05:00 PM', '06:00 PM', '07:00 PM', '08:00 PM'];
+    const pad2 = n => String(n).padStart(2, '0');
+
+    function nowIST() { return new Date(new Date().toLocaleString("en-US", { timeZone: TIMEZONE })); }
+    function ymd(d) { return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`; }
+    function fmtDateHuman(d) { return new Intl.DateTimeFormat('en-IN', { timeZone: TIMEZONE, day: '2-digit', month: 'short', year: 'numeric' }).format(d); }
+    function parseSlotOn(dateYMD, label) {
+      const m = /(\d{1,2}):(\d{2})\s*([AP]M)/i.exec(label); if (!m) return new Date();
+      let [_, hh, mm, ap] = m; let H = (parseInt(hh, 10) % 12) + (ap.toUpperCase() === 'PM' ? 12 : 0);
+      return new Date(`${dateYMD}T${pad2(H)}:${mm}:00`);
+    }
+    function nextAndPrevSlots(now) {
+      const today = ymd(now);
+      const todaySlots = SLOTS.map(lbl => ({ label: lbl, time: parseSlotOn(today, lbl), date: today }));
+      const futureToday = todaySlots.filter(s => s.time > now);
+      if (futureToday.length) {
+        const next = futureToday[0];
+        const prevCandidates = todaySlots.filter(s => s.time <= now);
+        const prev = prevCandidates.length ? prevCandidates.at(-1) :
+          (() => {
+            const yst = new Date(now); yst.setDate(now.getDate() - 1); const ymdY = ymd(yst);
+            return { label: SLOTS.at(-1), time: parseSlotOn(ymdY, SLOTS.at(-1)), date: ymdY };
+          })();
+        return { next, prev };
+      }
+      const tomorrow = new Date(now); tomorrow.setDate(now.getDate() + 1);
+      const next = { label: SLOTS[0], time: parseSlotOn(ymd(tomorrow), SLOTS[0]), date: ymd(tomorrow) };
+      const prev = { label: SLOTS.at(-1), time: parseSlotOn(today, SLOTS.at(-1)), date: today };
+      return { next, prev };
+    }
+    function msToHMS(ms) {
+      if (ms < 0) ms = 0;
+      const h = Math.floor(ms / 3600000), m = Math.floor((ms % 3600000) / 60000), s = Math.floor((ms % 60000) / 1000);
+      return `${pad2(h)}:${pad2(m)}:${pad2(s)}`;
+    }
+
+    /* ===== Helpers to read period/day from the *text* time ===== */
+    function periodFromLabel(label) {
+      const m = /(\d{1,2}):(\d{2})\s*([AP]M)/i.exec(label);
+      if (!m) return "AFTERNOON";
+      let [_, hh, mm, ap] = m; let H = (parseInt(hh, 10) % 12) + (ap.toUpperCase() === 'PM' ? 12 : 0);
+      if (H < 12) return "MORNING";
+      if (H < 17) return "AFTERNOON";
+      return "EVENING";
+    }
+    function weekdayForLabel(label, schedule) {
+      // Match the label to prev/next; fallback to next
+      if (schedule && schedule.prev && schedule.prev.label === label) {
+        return new Intl.DateTimeFormat('en-US', { timeZone: TIMEZONE, weekday: 'long' }).format(schedule.prev.time).toUpperCase();
+      }
+      if (schedule && schedule.next && schedule.next.label === label) {
+        return new Intl.DateTimeFormat('en-US', { timeZone: TIMEZONE, weekday: 'long' }).format(schedule.next.time).toUpperCase();
+      }
+      // Fallback: use today's weekday in IST
+      return new Intl.DateTimeFormat('en-US', { timeZone: TIMEZONE, weekday: 'long' }).format(nowIST()).toUpperCase();
+    }
+    function refreshBannersFromDrawText(scheduleRef) {
+      const label = drawTimeEl.textContent.trim();         // ← use the text that is shown
+      const period = periodFromLabel(label);
+      const weekday = weekdayForLabel(label, scheduleRef);
+      // Live banner uses short 5PM / 12:30PM style
+      const short = (() => {
+        const m = /(\d{1,2}):(\d{2})\s*([AP]M)/i.exec(label);
+        if (!m) return label.toUpperCase();
+        const [_, hh, mm, ap] = m; const h = String(parseInt(hh, 10));
+        return mm === "00" ? `${h}${ap.toUpperCase()}` : `${h}:${mm}${ap.toUpperCase()}`;
+      })();
+      liveEl.textContent = `DEAR ${period} ${weekday} LIVE ${short}`;
+      weeklyEl.textContent = `DEAR ${period} ${weekday} WEEKLY LOTTERY`;
+    }
+
+    /* ===== Reels ===== */
+    let spinTimers = [null, null, null, null, null];
+    let isSpinning = [false, false, false, false, false];
+    function setDigit(i, val, flare = false) {
+      digits[i].textContent = String(val);
+      if (flare) { digits[i].classList.add('flash'); setTimeout(() => digits[i].classList.remove('flash'), 260); }
+    }
+    function setAllTo(result, flare = false) {
+      const s = (result || "00000").padStart(5, '0').slice(0, 5);
+      for (let i = 0; i < 5; i++) setDigit(i, s[i], flare);
+    }
+    function startReel(i, period) {
+      if (isSpinning[i]) return;
+      isSpinning[i] = true; digits[i].classList.add('spinning');
+      digits[i].style.setProperty('--wobble-speed', `${period * 10}ms`);
+      clearInterval(spinTimers[i]); const tick = () => setDigit(i, Math.floor(Math.random() * 10)); tick();
+      spinTimers[i] = setInterval(tick, period);
+    }
+    function stopReelTo(i, val, delay) {
+      setTimeout(() => {
+        clearInterval(spinTimers[i]); isSpinning[i] = false;
+        digits[i].classList.remove('spinning'); setDigit(i, val, true);
+      }, delay);
+    }
+    function startAllReels() { const speeds = [72, 86, 99, 113, 127]; for (let i = 0; i < 5; i++) startReel(i, speeds[i]); }
+    function stopAllReelsWith(result) { const s = (result || "00000").padStart(5, '0'); for (let i = 0; i < 5; i++) stopReelTo(i, s[i], i * 160); }
+
+    /* ===== Firebase listeners & schedule ===== */
+    let unsubscribePrev = null, unsubscribeNext = null;
+    let prevOfficial = null, nextOfficial = null, schedule = null, tickHandle = null;
+
+    function listenPrev() {
+      if (unsubscribePrev) { unsubscribePrev(); unsubscribePrev = null; }
+      prevOfficial = null; const path = `lottery/${schedule.prev.date}/${schedule.prev.label}/result`;
+      unsubscribePrev = onValue(ref(db, path), snap => { if (snap.exists()) { prevOfficial = String(snap.val()).replace(/\D/g, '').padStart(5, '0').slice(0, 5); } });
+    }
+    function listenNext() {
+      if (unsubscribeNext) { unsubscribeNext(); unsubscribeNext = null; }
+      nextOfficial = null; const path = `lottery/${schedule.next.date}/${schedule.next.label}/result`;
+      unsubscribeNext = onValue(ref(db, path), snap => { if (snap.exists()) { nextOfficial = String(snap.val()).replace(/\D/g, '').padStart(5, '0').slice(0, 5); } });
+    }
+
+    function setupSchedule() {
+      schedule = nextAndPrevSlots(nowIST());
+      drawDateEl.textContent = fmtDateHuman(schedule.next.time);
+      // Initial chips: show PREV while waiting (your original behavior)
+      drawTimeEl.textContent = schedule.prev.label;
+      drawTimeLeftEl.textContent = schedule.prev.label;
+      refreshBannersFromDrawText(schedule);   // banners follow the chip text
+      listenPrev(); listenNext();
+    }
+
+    function loop() {
+      const now = nowIST();
+      const spinStart = new Date(schedule.next.time.getTime() - SPIN_WINDOW_MS);
+      const inWaiting = now < spinStart;
+      const inSpin = now >= spinStart && now < schedule.next.time;
+
+      if (inWaiting) {
+        countdownEl.textContent = `Next Draw: ${msToHMS(schedule.next.time - now)}`;
+        // keep showing previous draw time in chips
+        drawTimeEl.textContent = schedule.prev.label;
+        drawTimeLeftEl.textContent = schedule.prev.label;
+        if (prevOfficial && !isSpinning.some(Boolean)) { setAllTo(prevOfficial); }
+        refreshBannersFromDrawText(schedule);
+      }
+      else if (inSpin) {
+        countdownEl.textContent = `Next Draw: ${msToHMS(schedule.next.time - now)}`;
+        // still show previous draw time until result lands
+        drawTimeEl.textContent = schedule.prev.label;
+        drawTimeLeftEl.textContent = schedule.prev.label;
+        if (!isSpinning.some(Boolean)) startAllReels();
+        refreshBannersFromDrawText(schedule);
+      }
+      else {
+        countdownEl.textContent = `Result Time`;
+        // the draw just happened -> switch chips to THIS draw's time (next.label)
+        drawTimeEl.textContent = schedule.next.label;
+        drawTimeLeftEl.textContent = schedule.next.label;
+
+        if (isSpinning.some(Boolean)) {
+          if (nextOfficial) { stopAllReelsWith(nextOfficial); }
+        } else if (nextOfficial) {
+          setAllTo(nextOfficial);
+        }
+
+        refreshBannersFromDrawText(schedule);
+
+        // roll forward ~2 minutes to next cycle (which updates prev/next)
+        if (now - schedule.next.time > 120000) { setupSchedule(); }
+      }
+    }
+
+    setAllTo("00000");
+    setupSchedule();
+    if (tickHandle) clearInterval(tickHandle);
+    tickHandle = setInterval(loop, 1000);
+  </script>
+</body>
+
+</html>

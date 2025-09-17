@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DEARMC LOTTERY</title>
+  <link rel="stylesheet" href="resultnm.css"/>
+  <!-- Firebase init (use your config inside firebase-init.js) -->
+  <script type="module" src="firebase-init.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.9.3/confetti.min.js"></script>
+  <script type="module" defer src="resultnm.js"></script>
+</head>
+<body>
+  <div class="stage">
+    <h1 class="headline">Dearmc Result</h1>
+
+    <div class="controls">
+      <input type="date" id="select-date"/>
+    </div>
+
+    <!-- Only ONE card renders (active/next slot) -->
+    <div id="active-slot"></div>
+  </div>
+</body>
+</html>

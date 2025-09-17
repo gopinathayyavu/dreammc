@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -20,11 +21,13 @@
       justify-content: space-between;
       z-index: 1100;
     }
+
     .menu-icon span {
       height: 4px;
       background-color: #333;
       border-radius: 2px;
     }
+
     .sidebar {
       position: fixed;
       top: 0;
@@ -37,9 +40,11 @@
       transition: left 0.3s ease;
       z-index: 1000;
     }
+
     .sidebar.active {
       left: 0;
     }
+
     .sidebar a {
       display: block;
       padding: 12px;
@@ -49,9 +54,11 @@
       font-weight: bold;
       transition: background 0.2s;
     }
+
     .sidebar a:hover {
       background-color: #ddd;
     }
+
     .sidebar .close-btn {
       position: absolute;
       top: 10px;
@@ -60,10 +67,12 @@
       cursor: pointer;
       color: #333;
     }
+
     header {
       text-align: center;
       padding: 30px 10px 10px;
     }
+
     header h1 {
       font-size: 2.4rem;
       background: -webkit-linear-gradient(#00f0ff, #ff0080);
@@ -73,6 +82,7 @@
     }
   </style>
 </head>
+
 <body>
   <div class="menu-icon" onclick="document.querySelector('.sidebar').classList.add('active')">
     <span></span>
@@ -86,6 +96,7 @@
     <a href="result">Result Chart</a>
     <a href="mcchart">MC Chart</a>
     <a href="mc">MC</a>
+    <a href="results.html">Results</a>
   </div>
 
   <header>
@@ -100,4 +111,5 @@
     <div class="card-column" id="result-column"></div>
   </div>
 </body>
+
 </html>

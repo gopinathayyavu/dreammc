@@ -1,0 +1,293 @@
+html,
+body {
+    height: 100%;
+    margin: 0;
+    background: #000;
+    color: #fff;
+    font-family: system-ui, sans-serif;
+}
+
+.stage {
+    min-height: 100%;
+    display: grid;
+    place-items: center;
+    padding: 12px;
+}
+
+.frame {
+    position: relative;
+    width: min(1200px, 96vw);
+    aspect-ratio: 1247 / 768;
+    background: #000;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, .6);
+}
+
+.frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    user-select: none;
+    pointer-events: none;
+}
+
+/* ===== Banner 1 (TOP: Live time) ===== */
+.banner-live {
+    position: absolute;
+    inset: 0 0 auto 0;
+    top: 92%;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: #000;
+    font-size: 50px;
+    pointer-events: none;
+}
+
+/* ===== Banner 2 (WEEKLY LOTTERY) ===== */
+.banner-weekly {
+    position: absolute;
+    left: 0;
+    right: 75px;
+    top: 13%;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: #691a6b;
+    font-size: 31px;
+    line-height: 1;
+    user-select: none;
+    pointer-events: none;
+}
+
+/* ===== Digits overlay ===== */
+#reels {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.digit {
+    position: absolute;
+    left: var(--left);
+    top: var(--top);
+    transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) scale(var(--scale, 1));
+    transform-origin: center;
+    pointer-events: auto;
+    user-select: none;
+    cursor: default;
+    text-align: center;
+    font-weight: 600;
+    font-size: 100px;
+    line-height: 1;
+    color: #272626;
+}
+
+#d0 {
+    --left: 25%;
+    --top: 45.2%;
+    --rot: -0.6deg;
+}
+
+#d1 {
+    --left: 34.4%;
+    --top: 45.2%;
+    --rot: -0.2deg;
+}
+
+#d2 {
+    --left: 43.8%;
+    --top: 45.2%;
+    --rot: 0deg;
+}
+
+#d3 {
+    --left: 53.2%;
+    --top: 45.2%;
+    --rot: 0.2deg;
+}
+
+#d4 {
+    --left: 62.6%;
+    --top: 45.2%;
+    --rot: 0.6deg;
+}
+
+@media(max-width:520px) {
+    #d0 {
+        --left: 35.8%;
+    }
+
+    #d4 {
+        --left: 77.8%;
+    }
+}
+
+/* ===== Animations ===== */
+.digit.spinning {
+    animation: wobble var(--wobble-speed, 900ms) ease-in-out infinite alternate;
+}
+
+@keyframes wobble {
+    from {
+        transform: translate(-50%, -52%) rotate(calc(var(--rot, 0deg)-.35deg)) scale(var(--scale, 1));
+        opacity: .96;
+    }
+
+    to {
+        transform: translate(-50%, -48%) rotate(calc(var(--rot, 0deg)+.35deg)) scale(var(--scale, 1));
+        opacity: 1;
+    }
+}
+
+.digit.flash {
+    animation: flash .32s ease;
+}
+
+@keyframes flash {
+    from {
+        transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) scale(calc(var(--scale, 1)*1.08));
+        opacity: .85;
+    }
+
+    to {
+        transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) scale(var(--scale, 1));
+        opacity: 1;
+    }
+}
+
+/* ===== Info chips ===== */
+.info-bar1 {
+    position: absolute;
+    top: 78.9%;
+    left: 29%;
+    transform: translateX(-50%);
+    font-weight: 800;
+    font-size: 30px;
+    color: #EACF46;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, .8);
+}
+
+.info-bar2 {
+    position: absolute;
+    top: 77.9%;
+    left: 70.5%;
+    transform: translateX(-50%);
+    font-weight: 800;
+    font-size: 35px;
+    color: #EACF46;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, .8);
+}
+
+.info-bar3 {
+    position: absolute;
+    top: 29.9%;
+    left: -0.8%;
+    transform: rotate(270deg);
+    font-weight: 800;
+    font-size: 35px;
+    color: #EACF46;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, .8);
+}
+
+.countdown {
+    position: absolute;
+    width: 157px;
+    top: 27px;
+    right: 2px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 800;
+    background: #f3dd52;
+    color: #691a6b;
+    border: 1px solid rgba(255, 255, 255, .2);
+}
+
+/* Mobile first */
+@media (max-width: 576px) {
+    .digit {
+        font-size: 45px;
+    }
+
+    #d0 {
+        --left: 24.8%;
+        --scale: .72;
+    }
+
+    #d1 {
+        --scale: .72;
+    }
+
+    #d2 {
+        --scale: .72;
+    }
+
+    #d3 {
+        --scale: .72;
+    }
+
+    #d4 {
+        --left: 62.8%;
+        --scale: .72;
+    }
+
+    .countdown {
+        width: 57px;
+        font-size: 5px;
+        padding: 4px 8px;
+        top: 4px;
+        right: -2px;
+    }
+
+    .info-bar1 {
+        font-size: 9px;
+        top: 78.9%;
+        left: 29%;
+    }
+
+    .info-bar2 {
+        font-size: 9px;
+        top: 78.9%;
+        left: 70%;
+    }
+
+    .banner-live {
+        top: 85%;
+        height: 42px;
+        font-weight: 900;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        font-size: 15px;
+    }
+
+    .banner-weekly {
+        left: 42px;
+        top: 6%;
+        font-size: 9px;
+    }
+
+    .info-bar3 {
+        top: 29.9%;
+        left: -0.8%;
+        font-weight: 750;
+        font-size: 11px;
+    }
+}
+
+@media (min-width: 577px) and (max-width: 768px) {}
+
+@media (min-width: 769px) and (max-width: 992px) {}
+
+@media (min-width: 993px) and (max-width: 1200px) {}
+
+@media (min-width: 1201px) {}
