@@ -250,14 +250,14 @@ body {
     }
 
     .info-bar1 {
-        font-size: 9px;
+        font-size: 11px;
         top: 78.9%;
         left: 29%;
     }
 
     .info-bar2 {
-        font-size: 9px;
-        top: 78.9%;
+        font-size: 12px;
+        top: 77.9%;
         left: 70%;
     }
 
@@ -272,8 +272,8 @@ body {
 
     .banner-weekly {
         left: 42px;
-        top: 6%;
-        font-size: 9px;
+        top: 7%;
+        font-size: 8px;
     }
 
     .info-bar3 {
