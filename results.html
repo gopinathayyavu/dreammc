@@ -231,12 +231,10 @@
         if (now - schedule.next.time > 120000) { setupSchedule(); }
       }
     }
-
     setAllTo("00000");
     setupSchedule();
     if (tickHandle) clearInterval(tickHandle);
     tickHandle = setInterval(loop, 1000);
   </script>
 </body>
-
 </html>
