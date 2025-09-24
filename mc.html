@@ -52,27 +52,40 @@
             text-shadow: 2px 2px 5px white;
         }
 
-        #date-text {
-            top: 16%;
-            font-size: 3.4rem;
+        #time-text {
+            top: 18%;
+            font-size: 2.4rem;
             color: white;
             text-shadow:
-                -1px -1px 0 red,
-                1px -1px 0 red,
-                -1px 1px 0 red,
-                1px 1px 0 red;
+                -1px -1px 0 black,
+                1px -1px 0 black,
+                -1px 1px 0 black,
+                1px 1px 0 black;
         }
 
-        #time-text {
-            top: 27%;
-            font-size: 2.8rem;
+        #date-text {
+            top: 25%;
+            font-size: 1.8rem;
             color: white;
             text-shadow:
-                -1px -1px 0 red,
-                1px -1px 0 red,
-                -1px 1px 0 red,
-                1px 1px 0 red;
+                -1px -1px 0 black,
+                1px -1px 0 black,
+                -1px 1px 0 black,
+                1px 1px 0 black;
         }
+
+        #day-text {
+            top: 31%;
+            /* Adjust this if needed */
+            font-size: 1.6rem;
+            color: white;
+            text-shadow:
+                -1px -1px 0 black,
+                1px -1px 0 black,
+                -1px 1px 0 black,
+                1px 1px 0 black;
+        }
+
 
         .container {
             margin-top: 0%;
@@ -126,13 +139,18 @@
             }
 
             #date-text {
-                top: 16%;
-                font-size: 2rem !important;
+                top: 24%;
+                font-size: 1.3rem !important;
             }
 
             #time-text {
-                top: 27%;
-                font-size: 1.5rem !important;
+                top: 15%;
+                font-size: 1.8rem !important;
+            }
+
+            #day-text {
+                top: 31%;
+                font-size: 1rem !important;
             }
 
             .container {
@@ -145,15 +163,22 @@
                 font-size: 2rem !important;
             }
 
-            #date-text {
-                top: 17%;
-                font-size: 1.5rem;
+            #time-text {
+                top: 16%;
+                font-size: 1.2rem !important;
             }
 
-            #time-text {
-                top: 26%;
-                font-size: 1.3rem;
+            #date-text {
+                top: 24%;
+                font-size: 1rem !important;
             }
+
+            #day-text {
+                top: 30%;
+                font-size: 0.8rem !important;
+            }
+
+
 
             .container {
                 margin-top: 20%;
@@ -321,9 +346,10 @@
 
         <div id="image-container">
             <img id="template-img" src="./images/final.png" alt="MC Template" />
-
-            <div class="overlay" id="date-text"></div>
+            <!-- Date and Time Overlays -->
             <div class="overlay" id="time-text"></div>
+            <div class="overlay" id="date-text"></div>
+            <div class="overlay" id="day-text"></div>
 
             <!-- 5 Digit Overlays -->
             <div class="digit" id="digit-1">0</div>
@@ -342,64 +368,6 @@
             Stay tuned for more news! 🚨
         </div>
     </div>
-
-    <!-- <script type="module">
-        import { db } from './firebase-init.js';
-        import { ref, onValue } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js';
-
-        const timeSlots = ['10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM', '05:00 PM'];
-        const resultHours = [10, 11, 12, 13, 14, 15, 16, 17];
-
-        const dateEl = document.getElementById('date-text');
-        const timeEl = document.getElementById('time-text');
-
-        const now = new Date();
-        const currentHour = now.getHours();
-
-        const today = now.toISOString().split('T')[0];
-        const showSlotIndex = resultHours.findIndex(hour => currentHour < hour);
-
-        if (showSlotIndex > 0) {
-            const slot = timeSlots[showSlotIndex];
-            const hour = resultHours[showSlotIndex];
-
-            const displayDate = today;
-            const refPath = ref(db, `lottery/${displayDate}/${slot}`);
-
-            dateEl.textContent = displayDate;
-            timeEl.textContent = `D-${slot}`;
-
-            onValue(refPath, (snapshot) => {
-                const data = snapshot.val();
-                if (data && data.machine && data.machine.length === 5) {
-                    for (let i = 0; i < 5; i++) {
-                        const digitEl = document.getElementById(`digit-${i + 1}`);
-                        digitEl.textContent = data.machine[i];
-                    }
-                } else {
-                    for (let i = 1; i <= 5; i++) {
-                        document.getElementById(`digit-${i}`).textContent = '0';
-                    }
-                }
-            });
-        } else {
-            dateEl.textContent = today;
-            timeEl.textContent = 'No upcoming MC';
-            for (let i = 1; i <= 5; i++) {
-                document.getElementById(`digit-${i}`).textContent = '0';
-            }
-        }
-
-        // Download image
-        window.downloadImage = async function () {
-            const container = document.getElementById('image-container');
-            const canvas = await html2canvas(container);
-            const link = document.createElement('a');
-            link.download = 'mc-number.png';
-            link.href = canvas.toDataURL();
-            link.click();
-        }
-    </script> -->
 
     <script type="module">
         import { db } from './firebase-init.js';
@@ -438,8 +406,10 @@
         if (selectedSlotIndex >= 0) {
             const slot = timeSlots[selectedSlotIndex];
             const refPath = ref(db, `lottery/${todayDateStr}/${slot}`);
-
             dateEl.textContent = todayDateStr;
+            const dayEl = document.getElementById('day-text');
+            const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            dayEl.textContent = dayNames[now.getDay()];
             timeEl.textContent = `D-${slot}`;
 
             onValue(refPath, (snapshot) => {
