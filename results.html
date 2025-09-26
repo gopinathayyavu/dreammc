@@ -11,6 +11,20 @@
 </head>
 
 <body>
+  <div class="menu-icon" onclick="document.querySelector('.sidebar').classList.add('active')">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+
+  <div class="sidebar">
+    <span class="close-btn" onclick="document.querySelector('.sidebar').classList.remove('active')">&times;</span>
+    <a href="index.html">Home</a>
+    <a href="result.html">Result Chart</a>
+    <a href="mcchart.html">MC Chart</a>
+    <a href="mc.html">MC</a>
+    <a href="results.html">Result</a>
+  </div>
   <div class="stage">
     <div class="frame">
       <img src="dearmc6.png" alt="DEAR Lottery Frame" />
@@ -237,4 +251,5 @@
     tickHandle = setInterval(loop, 1000);
   </script>
 </body>
+
 </html>

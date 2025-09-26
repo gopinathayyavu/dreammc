@@ -2,9 +2,15 @@ html,
 body {
     height: 100%;
     margin: 0;
-    background: #000;
+    background: linear-gradient(135deg, #7bc4e4, #ffffff);
     color: #fff;
     font-family: system-ui, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 .stage {
@@ -18,9 +24,7 @@ body {
     position: relative;
     width: min(1200px, 96vw);
     aspect-ratio: 1247 / 768;
-    background: #000;
     overflow: hidden;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, .6);
 }
 
 .frame img {
@@ -291,3 +295,62 @@ body {
 @media (min-width: 993px) and (max-width: 1200px) {}
 
 @media (min-width: 1201px) {}
+
+.menu-icon {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 30px;
+    height: 25px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    z-index: 1100;
+}
+
+.menu-icon span {
+    height: 4px;
+    background-color: #333;
+    border-radius: 2px;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -250px;
+    width: 250px;
+    height: 100%;
+    background: linear-gradient(135deg, #f0f8ff, #e6e6fa);
+    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.1);
+    padding: 60px 20px;
+    transition: left 0.3s ease;
+    z-index: 1000;
+}
+
+.sidebar.active {
+    left: 0;
+}
+
+.sidebar a {
+    display: block;
+    padding: 12px;
+    color: #333;
+    text-decoration: none;
+    margin-bottom: 10px;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+.sidebar a:hover {
+    background-color: #ddd;
+}
+
+.sidebar .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #333;
+}
