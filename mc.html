@@ -94,6 +94,7 @@
         #date-text,
         #day-text {
             font-weight: 900;
+            letter-spacing: 5px !important;
             text-shadow:
                 -1px 0 black,
                 1px 0 black,
@@ -134,15 +135,20 @@
             }
 
             #date-text {
-                top: 21%;
-                font-size: 1.3rem;
+                top: 28%;
+                font-size: 1.8rem;
                 margin-left: -1%;
             }
 
             #time-text {
-                top: 29%;
-                font-size: 1rem;
+                top: 19%;
+                font-size: 2rem;
                 margin-left: -2%;
+            }
+
+            #day-text {
+                top: 36%;
+                font-size: 1.4rem !important;
             }
 
             .container {
@@ -396,7 +402,10 @@
         const timeEl = document.getElementById('time-text');
 
         const now = new Date();
-        const todayDateStr = now.toISOString().split('T')[0];
+        const todayDateStr =
+            String(now.getDate()).padStart(2, '0') + '/' +
+            String(now.getMonth() + 1).padStart(2, '0') + '/' +
+            now.getFullYear();
 
 
         // Function to parse slot string into Date object for today
