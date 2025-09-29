@@ -4,10 +4,44 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DEAR Lottery – Live Result (Auto schedule)</title>
+  <title>DEARMC Lottery</title>
   <link rel="stylesheet" href="results.css" />
+  <style>
+    /* minimal styles for the download bar/button */
+    .download-bar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: .75rem;
+      margin: 18px 0 28px;
+    }
 
+    .btn-download {
+      appearance: none;
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font: 600 16px/1.1 system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      background: #6e4bff;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 10px 24px rgba(110, 75, 255, .28);
+      transition: transform .06s ease, filter .2s ease;
+    }
 
+    .btn-download:hover {
+      filter: brightness(1.06);
+    }
+
+    .btn-download:active {
+      transform: translateY(1px) scale(.99);
+    }
+
+    /* keep it centered under your stage */
+    .stage+.download-bar {
+      margin-top: 12px;
+    }
+  </style>
 </head>
 
 <body>
@@ -25,6 +59,7 @@
     <a href="mc.html">MC</a>
     <a href="results.html">Result</a>
   </div>
+
   <div class="stage">
     <div class="frame">
       <img src="dearmc6.png" alt="DEAR Lottery Frame" />
@@ -53,7 +88,18 @@
       </div>
       <div class="countdown" id="countdown">--:--:--</div>
     </div>
+    <div>
+      <button class="btn-download" id="downloadBtn" type="button">
+        ⬇️ Download Result Image
+      </button>
+    </div>
   </div>
+
+  <!-- Download button -->
+
+
+  <!-- html2canvas for DOM → image capture -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
@@ -118,7 +164,6 @@
       return `${pad2(h)}:${pad2(m)}:${pad2(s)}`;
     }
 
-    /* ===== Helpers to read period/day from the *text* time ===== */
     function periodFromLabel(label) {
       const m = /(\d{1,2}):(\d{2})\s*([AP]M)/i.exec(label);
       if (!m) return "AFTERNOON";
@@ -128,21 +173,18 @@
       return "EVENING";
     }
     function weekdayForLabel(label, schedule) {
-      // Match the label to prev/next; fallback to next
       if (schedule && schedule.prev && schedule.prev.label === label) {
         return new Intl.DateTimeFormat('en-US', { timeZone: TIMEZONE, weekday: 'long' }).format(schedule.prev.time).toUpperCase();
       }
       if (schedule && schedule.next && schedule.next.label === label) {
         return new Intl.DateTimeFormat('en-US', { timeZone: TIMEZONE, weekday: 'long' }).format(schedule.next.time).toUpperCase();
       }
-      // Fallback: use today's weekday in IST
       return new Intl.DateTimeFormat('en-US', { timeZone: TIMEZONE, weekday: 'long' }).format(nowIST()).toUpperCase();
     }
     function refreshBannersFromDrawText(scheduleRef) {
-      const label = drawTimeEl.textContent.trim();         // ← use the text that is shown
+      const label = drawTimeEl.textContent.trim();
       const period = periodFromLabel(label);
       const weekday = weekdayForLabel(label, scheduleRef);
-      // Live banner uses short 5PM / 12:30PM style
       const short = (() => {
         const m = /(\d{1,2}):(\d{2})\s*([AP]M)/i.exec(label);
         if (!m) return label.toUpperCase();
@@ -153,7 +195,6 @@
       weeklyEl.textContent = `DEAR ${period} ${weekday} WEEKLY LOTTERY`;
     }
 
-    /* ===== Reels ===== */
     let spinTimers = [null, null, null, null, null];
     let isSpinning = [false, false, false, false, false];
     function setDigit(i, val, flare = false) {
@@ -180,7 +221,6 @@
     function startAllReels() { const speeds = [72, 86, 99, 113, 127]; for (let i = 0; i < 5; i++) startReel(i, speeds[i]); }
     function stopAllReelsWith(result) { const s = (result || "00000").padStart(5, '0'); for (let i = 0; i < 5; i++) stopReelTo(i, s[i], i * 160); }
 
-    /* ===== Firebase listeners & schedule ===== */
     let unsubscribePrev = null, unsubscribeNext = null;
     let prevOfficial = null, nextOfficial = null, schedule = null, tickHandle = null;
 
@@ -198,10 +238,10 @@
     function setupSchedule() {
       schedule = nextAndPrevSlots(nowIST());
       drawDateEl.textContent = fmtDateHuman(schedule.next.time);
-      // Initial chips: show PREV while waiting (your original behavior)
+      // Show PREV in chips while waiting
       drawTimeEl.textContent = schedule.prev.label;
       drawTimeLeftEl.textContent = schedule.prev.label;
-      refreshBannersFromDrawText(schedule);   // banners follow the chip text
+      refreshBannersFromDrawText(schedule);
       listenPrev(); listenNext();
     }
 
@@ -213,7 +253,6 @@
 
       if (inWaiting) {
         countdownEl.textContent = `Next Draw: ${msToHMS(schedule.next.time - now)}`;
-        // keep showing previous draw time in chips
         drawTimeEl.textContent = schedule.prev.label;
         drawTimeLeftEl.textContent = schedule.prev.label;
         if (prevOfficial && !isSpinning.some(Boolean)) { setAllTo(prevOfficial); }
@@ -221,7 +260,6 @@
       }
       else if (inSpin) {
         countdownEl.textContent = `Next Draw: ${msToHMS(schedule.next.time - now)}`;
-        // still show previous draw time until result lands
         drawTimeEl.textContent = schedule.prev.label;
         drawTimeLeftEl.textContent = schedule.prev.label;
         if (!isSpinning.some(Boolean)) startAllReels();
@@ -229,7 +267,6 @@
       }
       else {
         countdownEl.textContent = `Result Time`;
-        // the draw just happened -> switch chips to THIS draw's time (next.label)
         drawTimeEl.textContent = schedule.next.label;
         drawTimeLeftEl.textContent = schedule.next.label;
 
@@ -241,7 +278,6 @@
 
         refreshBannersFromDrawText(schedule);
 
-        // roll forward ~2 minutes to next cycle (which updates prev/next)
         if (now - schedule.next.time > 120000) { setupSchedule(); }
       }
     }
@@ -249,6 +285,22 @@
     setupSchedule();
     if (tickHandle) clearInterval(tickHandle);
     tickHandle = setInterval(loop, 1000);
+
+    document.getElementById("downloadBtn").addEventListener("click", () => {
+      const stage = document.querySelector('.frame');
+      html2canvas(stage, { backgroundColor: null, scale: 2 }).then(canvas => {
+        canvas.toBlob(blob => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `dearmc-result-${new Date().toISOString().slice(0, 10)}-${drawTimeEl.textContent.trim().replace(/\s+/g, '')}.png`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }, 'image/png');
+      });
+    });
   </script>
 </body>
 
