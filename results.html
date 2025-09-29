@@ -5,9 +5,419 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DEARMC Lottery</title>
-  <link rel="stylesheet" href="results.css" />
+
   <style>
-    /* minimal styles for the download bar/button */
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      background: linear-gradient(135deg, #7bc4e4, #ffffff);
+      color: #fff;
+      font-family: system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    .stage {
+      min-height: 100%;
+      display: grid;
+      place-items: center;
+      padding: 12px;
+    }
+
+    .frame {
+      position: relative;
+      width: min(1200px, 96vw);
+      aspect-ratio: 1247/768;
+      overflow: hidden;
+    }
+
+    .frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    /* ===== Banners ===== */
+    .banner-live {
+      position: absolute;
+      inset: 0 0 auto 0;
+      top: 92%;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: #000;
+      font-size: 50px;
+      pointer-events: none;
+    }
+
+    .banner-weekly {
+      position: absolute;
+      left: 0;
+      right: 75px;
+      top: 13%;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: #691a6b;
+      font-size: 31px;
+      line-height: 1;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    /* ===== Digits overlay ===== */
+    #reels {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .digit {
+      position: absolute;
+      left: var(--left);
+      top: var(--top);
+      transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) scale(var(--scale, 1));
+      transform-origin: center;
+      pointer-events: auto;
+      user-select: none;
+      cursor: default;
+      text-align: center;
+      font-weight: 700;
+      font-size: 100px;
+      line-height: 1;
+      color: #272626;
+    }
+
+    /* exact slot positions on the machine */
+    #d0 {
+      --left: 25%;
+      --top: 45.2%;
+      --rot: -0.6deg;
+    }
+
+    #d1 {
+      --left: 34.4%;
+      --top: 45.2%;
+      --rot: -0.2deg;
+    }
+
+    #d2 {
+      --left: 43.8%;
+      --top: 45.2%;
+      --rot: 0deg;
+    }
+
+    #d3 {
+      --left: 53.2%;
+      --top: 45.2%;
+      --rot: 0.2deg;
+    }
+
+    #d4 {
+      --left: 62.6%;
+      --top: 45.2%;
+      --rot: 0.6deg;
+    }
+
+    @media (max-width:520px) {
+      #d0 {
+        --left: 35.8%;
+      }
+
+      #d4 {
+        --left: 77.8%;
+      }
+    }
+
+    /* ===== Animations (fixed: no Y drift) ===== */
+    .digit.spinning {
+      animation: wobble var(--wobble-speed, 900ms) ease-in-out infinite alternate;
+    }
+
+    @keyframes wobble {
+      from {
+        transform: translate(-50%, -50%) rotate(calc(var(--rot, 0deg) - .35deg)) scale(var(--scale, 1));
+        opacity: .96;
+      }
+
+      to {
+        transform: translate(-50%, -50%) rotate(calc(var(--rot, 0deg) + .35deg)) scale(var(--scale, 1));
+        opacity: 1;
+      }
+    }
+
+    .digit.flash {
+      animation: flash .32s ease;
+    }
+
+    @keyframes flash {
+      from {
+        transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) scale(calc(var(--scale, 1)*1.08));
+        opacity: .85;
+      }
+
+      to {
+        transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) scale(var(--scale, 1));
+        opacity: 1;
+      }
+    }
+
+    /* ===== Info chips ===== */
+    .info-bar1 {
+      position: absolute;
+      top: 78.9%;
+      left: 29%;
+      transform: translateX(-50%);
+      font-weight: 800;
+      font-size: 30px;
+      color: #EACF46;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, .8);
+    }
+
+    .info-bar2 {
+      position: absolute;
+      top: 77.9%;
+      left: 70.5%;
+      transform: translateX(-50%);
+      font-weight: 800;
+      font-size: 35px;
+      color: #EACF46;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, .8);
+    }
+
+    .info-bar3 {
+      position: absolute;
+      top: 29.9%;
+      left: -0.8%;
+      transform: rotate(270deg);
+      font-weight: 800;
+      font-size: 35px;
+      color: #EACF46;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, .8);
+    }
+
+    .countdown {
+      position: absolute;
+      width: 157px;
+      top: 27px;
+      right: 2px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 800;
+      background: #f3dd52;
+      color: #691a6b;
+      border: 1px solid rgba(255, 255, 255, .2);
+    }
+
+    /* ===== Mobile / Tablet ===== */
+    @media (max-width:576px) {
+      .digit {
+        font-size: 30px;
+        font-weight: 800;
+      }
+
+      #d0 {
+        --left: 24.8%;
+        --scale: .72;
+      }
+
+      #d1 {
+        --scale: .72;
+      }
+
+      #d2 {
+        --scale: .72;
+      }
+
+      #d3 {
+        --scale: .72;
+      }
+
+      #d4 {
+        --left: 62.8%;
+        --scale: .72;
+      }
+
+      .countdown {
+        width: 57px;
+        font-size: 5px;
+        padding: 4px 8px;
+        top: 4px;
+        right: -2px;
+      }
+
+      .info-bar1 {
+        font-size: 10px;
+        top: 77.9%;
+        left: 29%;
+      }
+
+      .info-bar2 {
+        font-size: 10px;
+        top: 77.9%;
+        left: 70%;
+      }
+
+      .banner-live {
+        top: 85%;
+        font-size: 15px;
+      }
+
+      .banner-weekly {
+        left: 42px;
+        top: 7%;
+        font-size: 8px;
+      }
+
+      .info-bar3 {
+        font-size: 11px;
+        font-weight: 750;
+      }
+    }
+
+    @media (min-width:577px) and (max-width:768px) {
+      .digit {
+        font-size: 50px;
+        font-weight: 700;
+      }
+
+      #d0 {
+        --left: 24.8%;
+        --scale: .72;
+      }
+
+      #d1 {
+        --scale: .72;
+      }
+
+      #d2 {
+        --scale: .72;
+      }
+
+      #d3 {
+        --scale: .72;
+      }
+
+      #d4 {
+        --left: 62.8%;
+        --scale: .72;
+      }
+
+      .countdown {
+        width: 57px;
+        font-size: 5px;
+        padding: 4px 8px;
+        top: 4px;
+        right: -2px;
+      }
+
+      .info-bar1 {
+        font-size: 20px;
+        top: 78.9%;
+        left: 29%;
+      }
+
+      .info-bar2 {
+        font-size: 20px;
+        top: 77.9%;
+        left: 70%;
+      }
+
+      .banner-live {
+        top: 89%;
+        font-size: 25px;
+      }
+
+      .banner-weekly {
+        left: 42px;
+        top: 10%;
+        font-size: 15px;
+      }
+
+      .info-bar3 {
+        font-size: 20px;
+        font-weight: 750;
+      }
+    }
+
+    /* ===== Menu / Sidebar ===== */
+    .menu-icon {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      width: 30px;
+      height: 25px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      z-index: 1100;
+    }
+
+    .menu-icon span {
+      height: 4px;
+      background: #333;
+      border-radius: 2px;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 250px;
+      height: 100%;
+      background: linear-gradient(135deg, #f0f8ff, #e6e6fa);
+      box-shadow: 4px 0 12px rgba(0, 0, 0, .1);
+      padding: 60px 20px;
+      transition: left .3s ease;
+      z-index: 1000;
+    }
+
+    .sidebar.active {
+      left: 0;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 12px;
+      color: #333;
+      text-decoration: none;
+      margin-bottom: 10px;
+      font-weight: bold;
+      transition: background .2s;
+    }
+
+    .sidebar a:hover {
+      background: #ddd;
+    }
+
+    .sidebar .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 24px;
+      cursor: pointer;
+      color: #333;
+    }
+
+    /* ===== Download button ===== */
     .download-bar {
       display: flex;
       justify-content: center;
@@ -37,7 +447,6 @@
       transform: translateY(1px) scale(.99);
     }
 
-    /* keep it centered under your stage */
     .stage+.download-bar {
       margin-top: 12px;
     }
@@ -45,12 +454,12 @@
 </head>
 
 <body>
+  <!-- Burger -->
   <div class="menu-icon" onclick="document.querySelector('.sidebar').classList.add('active')">
-    <span></span>
-    <span></span>
-    <span></span>
+    <span></span><span></span><span></span>
   </div>
 
+  <!-- Sidebar -->
   <div class="sidebar">
     <span class="close-btn" onclick="document.querySelector('.sidebar').classList.remove('active')">&times;</span>
     <a href="index.html">Home</a>
@@ -60,6 +469,7 @@
     <a href="results.html">Result</a>
   </div>
 
+  <!-- Stage -->
   <div class="stage">
     <div class="frame">
       <img src="dearmc6.png" alt="DEAR Lottery Frame" />
@@ -72,6 +482,7 @@
         <div class="info-chip" id="draw-time-left">--</div>
       </div>
 
+      <!-- Reels -->
       <div id="reels">
         <span class="digit" id="d0">0</span>
         <span class="digit" id="d1">0</span>
@@ -88,20 +499,18 @@
       </div>
       <div class="countdown" id="countdown">--:--:--</div>
     </div>
-    <div>
-      <button class="btn-download" id="downloadBtn" type="button">
-        ⬇️ Download Result Image
-      </button>
+
+    <div class="download-bar">
+      <button class="btn-download" id="downloadBtn" type="button">⬇️ Download Result Image</button>
     </div>
   </div>
 
-  <!-- Download button -->
-
-
-  <!-- html2canvas for DOM → image capture -->
+  <!-- html2canvas for DOM → PNG -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
+  <!-- App logic -->
   <script type="module">
+    /* Firebase */
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
     import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js";
 
@@ -118,6 +527,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
+    /* Elements */
     const digits = ["d0", "d1", "d2", "d3", "d4"].map(id => document.getElementById(id));
     const drawDateEl = document.getElementById("draw-date");
     const drawTimeEl = document.getElementById("draw-time");
@@ -126,14 +536,14 @@
     const liveEl = document.getElementById("banner-live");
     const weeklyEl = document.getElementById("banner-weekly");
 
+    /* Time helpers */
     const TIMEZONE = "Asia/Kolkata";
     const SPIN_WINDOW_MS = 5 * 60 * 1000;
     const SLOTS = ['10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '05:00 PM', '06:00 PM', '07:00 PM', '08:00 PM'];
     const pad2 = n => String(n).padStart(2, '0');
-
-    function nowIST() { return new Date(new Date().toLocaleString("en-US", { timeZone: TIMEZONE })); }
-    function ymd(d) { return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`; }
-    function fmtDateHuman(d) { return new Intl.DateTimeFormat('en-IN', { timeZone: TIMEZONE, day: '2-digit', month: 'short', year: 'numeric' }).format(d); }
+    const nowIST = () => new Date(new Date().toLocaleString("en-US", { timeZone: TIMEZONE }));
+    const ymd = d => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+    const fmtDateHuman = d => new Intl.DateTimeFormat('en-IN', { timeZone: TIMEZONE, day: '2-digit', month: 'short', year: 'numeric' }).format(d);
     function parseSlotOn(dateYMD, label) {
       const m = /(\d{1,2}):(\d{2})\s*([AP]M)/i.exec(label); if (!m) return new Date();
       let [_, hh, mm, ap] = m; let H = (parseInt(hh, 10) % 12) + (ap.toUpperCase() === 'PM' ? 12 : 0);
@@ -146,10 +556,10 @@
       if (futureToday.length) {
         const next = futureToday[0];
         const prevCandidates = todaySlots.filter(s => s.time <= now);
-        const prev = prevCandidates.length ? prevCandidates.at(-1) :
-          (() => {
-            const yst = new Date(now); yst.setDate(now.getDate() - 1); const ymdY = ymd(yst);
-            return { label: SLOTS.at(-1), time: parseSlotOn(ymdY, SLOTS.at(-1)), date: ymdY };
+        const prev = prevCandidates.length ? prevCandidates.at(-1)
+          : (() => {
+            const yst = new Date(now); yst.setDate(now.getDate() - 1);
+            const ymdY = ymd(yst); return { label: SLOTS.at(-1), time: parseSlotOn(ymdY, SLOTS.at(-1)), date: ymdY };
           })();
         return { next, prev };
       }
@@ -158,36 +568,23 @@
       const prev = { label: SLOTS.at(-1), time: parseSlotOn(today, SLOTS.at(-1)), date: today };
       return { next, prev };
     }
-    function msToHMS(ms) {
-      if (ms < 0) ms = 0;
-      const h = Math.floor(ms / 3600000), m = Math.floor((ms % 3600000) / 60000), s = Math.floor((ms % 60000) / 1000);
-      return `${pad2(h)}:${pad2(m)}:${pad2(s)}`;
-    }
-
-    function periodFromLabel(label) {
-      const m = /(\d{1,2}):(\d{2})\s*([AP]M)/i.exec(label);
-      if (!m) return "AFTERNOON";
+    const msToHMS = (ms) => { if (ms < 0) ms = 0; const h = Math.floor(ms / 3600000), m = Math.floor((ms % 3600000) / 60000), s = Math.floor((ms % 60000) / 1000); return `${pad2(h)}:${pad2(m)}:${pad2(s)}`; };
+    const periodFromLabel = (label) => {
+      const m = /(\d{1,2}):(\d{2})\s*([AP]M)/i.exec(label); if (!m) return "AFTERNOON";
       let [_, hh, mm, ap] = m; let H = (parseInt(hh, 10) % 12) + (ap.toUpperCase() === 'PM' ? 12 : 0);
-      if (H < 12) return "MORNING";
-      if (H < 17) return "AFTERNOON";
-      return "EVENING";
-    }
-    function weekdayForLabel(label, schedule) {
-      if (schedule && schedule.prev && schedule.prev.label === label) {
-        return new Intl.DateTimeFormat('en-US', { timeZone: TIMEZONE, weekday: 'long' }).format(schedule.prev.time).toUpperCase();
-      }
-      if (schedule && schedule.next && schedule.next.label === label) {
-        return new Intl.DateTimeFormat('en-US', { timeZone: TIMEZONE, weekday: 'long' }).format(schedule.next.time).toUpperCase();
-      }
+      if (H < 12) return "MORNING"; if (H < 17) return "AFTERNOON"; return "EVENING";
+    };
+    const weekdayForLabel = (label, schedule) => {
+      if (schedule?.prev?.label === label) return new Intl.DateTimeFormat('en-US', { timeZone: TIMEZONE, weekday: 'long' }).format(schedule.prev.time).toUpperCase();
+      if (schedule?.next?.label === label) return new Intl.DateTimeFormat('en-US', { timeZone: TIMEZONE, weekday: 'long' }).format(schedule.next.time).toUpperCase();
       return new Intl.DateTimeFormat('en-US', { timeZone: TIMEZONE, weekday: 'long' }).format(nowIST()).toUpperCase();
-    }
+    };
     function refreshBannersFromDrawText(scheduleRef) {
       const label = drawTimeEl.textContent.trim();
       const period = periodFromLabel(label);
       const weekday = weekdayForLabel(label, scheduleRef);
       const short = (() => {
-        const m = /(\d{1,2}):(\d{2})\s*([AP]M)/i.exec(label);
-        if (!m) return label.toUpperCase();
+        const m = /(\d{1,2}):(\d{2})\s*([AP]M)/i.exec(label); if (!m) return label.toUpperCase();
         const [_, hh, mm, ap] = m; const h = String(parseInt(hh, 10));
         return mm === "00" ? `${h}${ap.toUpperCase()}` : `${h}:${mm}${ap.toUpperCase()}`;
       })();
@@ -195,22 +592,18 @@
       weeklyEl.textContent = `DEAR ${period} ${weekday} WEEKLY LOTTERY`;
     }
 
+    /* Reels */
     let spinTimers = [null, null, null, null, null];
     let isSpinning = [false, false, false, false, false];
-    function setDigit(i, val, flare = false) {
-      digits[i].textContent = String(val);
-      if (flare) { digits[i].classList.add('flash'); setTimeout(() => digits[i].classList.remove('flash'), 260); }
-    }
-    function setAllTo(result, flare = false) {
-      const s = (result || "00000").padStart(5, '0').slice(0, 5);
-      for (let i = 0; i < 5; i++) setDigit(i, s[i], flare);
-    }
+    const setDigit = (i, val, flare = false) => { digits[i].textContent = String(val); if (flare) { digits[i].classList.add('flash'); setTimeout(() => digits[i].classList.remove('flash'), 260); } };
+    const setAllTo = (result, flare = false) => { const s = (result || "00000").padStart(5, '0').slice(0, 5); for (let i = 0; i < 5; i++) setDigit(i, s[i], flare); };
     function startReel(i, period) {
       if (isSpinning[i]) return;
       isSpinning[i] = true; digits[i].classList.add('spinning');
       digits[i].style.setProperty('--wobble-speed', `${period * 10}ms`);
-      clearInterval(spinTimers[i]); const tick = () => setDigit(i, Math.floor(Math.random() * 10)); tick();
-      spinTimers[i] = setInterval(tick, period);
+      clearInterval(spinTimers[i]);
+      const tick = () => setDigit(i, Math.floor(Math.random() * 10));
+      tick(); spinTimers[i] = setInterval(tick, period);
     }
     function stopReelTo(i, val, delay) {
       setTimeout(() => {
@@ -218,27 +611,34 @@
         digits[i].classList.remove('spinning'); setDigit(i, val, true);
       }, delay);
     }
-    function startAllReels() { const speeds = [72, 86, 99, 113, 127]; for (let i = 0; i < 5; i++) startReel(i, speeds[i]); }
-    function stopAllReelsWith(result) { const s = (result || "00000").padStart(5, '0'); for (let i = 0; i < 5; i++) stopReelTo(i, s[i], i * 160); }
+    const startAllReels = () => { const speeds = [72, 86, 99, 113, 127]; for (let i = 0; i < 5; i++) startReel(i, speeds[i]); };
+    const stopAllReelsWith = (result) => { const s = (result || "00000").padStart(5, '0'); for (let i = 0; i < 5; i++) stopReelTo(i, s[i], i * 160); };
 
+    /* Firebase listeners & scheduler */
     let unsubscribePrev = null, unsubscribeNext = null;
     let prevOfficial = null, nextOfficial = null, schedule = null, tickHandle = null;
 
     function listenPrev() {
       if (unsubscribePrev) { unsubscribePrev(); unsubscribePrev = null; }
-      prevOfficial = null; const path = `lottery/${schedule.prev.date}/${schedule.prev.label}/result`;
-      unsubscribePrev = onValue(ref(db, path), snap => { if (snap.exists()) { prevOfficial = String(snap.val()).replace(/\D/g, '').padStart(5, '0').slice(0, 5); } });
+      prevOfficial = null;
+      const path = `lottery/${schedule.prev.date}/${schedule.prev.label}/result`;
+      unsubscribePrev = onValue(ref(db, path), snap => {
+        if (snap.exists()) prevOfficial = String(snap.val()).replace(/\D/g, '').padStart(5, '0').slice(0, 5);
+      });
     }
     function listenNext() {
       if (unsubscribeNext) { unsubscribeNext(); unsubscribeNext = null; }
-      nextOfficial = null; const path = `lottery/${schedule.next.date}/${schedule.next.label}/result`;
-      unsubscribeNext = onValue(ref(db, path), snap => { if (snap.exists()) { nextOfficial = String(snap.val()).replace(/\D/g, '').padStart(5, '0').slice(0, 5); } });
+      nextOfficial = null;
+      const path = `lottery/${schedule.next.date}/${schedule.next.label}/result`;
+      unsubscribeNext = onValue(ref(db, path), snap => {
+        if (snap.exists()) nextOfficial = String(snap.val()).replace(/\D/g, '').padStart(5, '0').slice(0, 5);
+      });
     }
 
     function setupSchedule() {
       schedule = nextAndPrevSlots(nowIST());
       drawDateEl.textContent = fmtDateHuman(schedule.next.time);
-      // Show PREV in chips while waiting
+      // show previous slot in chips while waiting
       drawTimeEl.textContent = schedule.prev.label;
       drawTimeLeftEl.textContent = schedule.prev.label;
       refreshBannersFromDrawText(schedule);
@@ -255,37 +655,38 @@
         countdownEl.textContent = `Next Draw: ${msToHMS(schedule.next.time - now)}`;
         drawTimeEl.textContent = schedule.prev.label;
         drawTimeLeftEl.textContent = schedule.prev.label;
-        if (prevOfficial && !isSpinning.some(Boolean)) { setAllTo(prevOfficial); }
+        if (prevOfficial && !isSpinning.some(Boolean)) setAllTo(prevOfficial);
         refreshBannersFromDrawText(schedule);
-      }
-      else if (inSpin) {
+      } else if (inSpin) {
         countdownEl.textContent = `Next Draw: ${msToHMS(schedule.next.time - now)}`;
         drawTimeEl.textContent = schedule.prev.label;
         drawTimeLeftEl.textContent = schedule.prev.label;
         if (!isSpinning.some(Boolean)) startAllReels();
         refreshBannersFromDrawText(schedule);
-      }
-      else {
+      } else {
         countdownEl.textContent = `Result Time`;
         drawTimeEl.textContent = schedule.next.label;
         drawTimeLeftEl.textContent = schedule.next.label;
 
         if (isSpinning.some(Boolean)) {
-          if (nextOfficial) { stopAllReelsWith(nextOfficial); }
+          if (nextOfficial) stopAllReelsWith(nextOfficial);
         } else if (nextOfficial) {
           setAllTo(nextOfficial);
         }
 
         refreshBannersFromDrawText(schedule);
 
-        if (now - schedule.next.time > 120000) { setupSchedule(); }
+        // after ~2 minutes post result, roll to the next schedule
+        if (now - schedule.next.time > 120000) setupSchedule();
       }
     }
+
     setAllTo("00000");
     setupSchedule();
     if (tickHandle) clearInterval(tickHandle);
     tickHandle = setInterval(loop, 1000);
 
+    /* Download PNG */
     document.getElementById("downloadBtn").addEventListener("click", () => {
       const stage = document.querySelector('.frame');
       html2canvas(stage, { backgroundColor: null, scale: 2 }).then(canvas => {
@@ -294,9 +695,7 @@
           const a = document.createElement('a');
           a.href = url;
           a.download = `dearmc-result-${new Date().toISOString().slice(0, 10)}-${drawTimeEl.textContent.trim().replace(/\s+/g, '')}.png`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
+          document.body.appendChild(a); a.click(); document.body.removeChild(a);
           URL.revokeObjectURL(url);
         }, 'image/png');
       });

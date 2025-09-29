@@ -90,7 +90,7 @@ body {
     user-select: none;
     cursor: default;
     text-align: center;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 100px;
     line-height: 1;
     color: #272626;
@@ -221,7 +221,7 @@ body {
 @media (max-width: 576px) {
     .digit {
         font-size: 30px;
-        font-weight: 700;
+        font-weight: 800;
     }
 
     #d0 {
