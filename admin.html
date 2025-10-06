@@ -113,7 +113,8 @@
         }
 
         #submit-data-btn,
-        #logout-btn {
+        #logout-btn,
+        #view-btn {
             background: #00f0ff;
             color: #111;
             font-weight: bold;
@@ -124,9 +125,15 @@
         }
 
         #submit-data-btn:hover,
-        #logout-btn:hover {
+        #logout-btn:hover,
+        #view-btn:hover {
             background: #ff0080;
             color: #fff;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
         }
     </style>
     <script type="module" src="firebase-init.js" defer></script>
@@ -154,6 +161,7 @@
         <div style="text-align: center; margin-top: 20px;">
             <button id="submit-data-btn">Submit</button>
             <button id="logout-btn">Logout</button>
+            <a href="view.html"><button id="view-btn">View</button></a>
         </div>
     </div>
 </body>
