@@ -138,6 +138,20 @@
             font-weight: 700;
         }
 
+        .dwn-btn {
+            background: linear-gradient(135deg, #00cfff, #00a8ff);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .dwn-btn:hover {
+            background: linear-gradient(135deg, #00a8ff, #0080ff);
+        }
+
         /* Table */
         .table-container {
             width: 90%;
@@ -239,7 +253,6 @@
         <select id="yearSelect" aria-label="Select year"></select>
         <button id="applyBtn">Apply</button>
         <button id="showAllBtn" class="secondary">Show All</button>
-        <button id="downloadPngBtn" class="neutral">Download Table (PNG)</button>
     </div>
 
     <div class="table-container">
@@ -262,6 +275,10 @@
             </thead>
             <tbody id="result-body"></tbody>
         </table>
+    </div>
+
+    <div style="text-align:center; margin-bottom:20px;">
+        <button id="downloadPngBtn" class="dwn-btn">Download</button>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
@@ -311,6 +328,11 @@
                 const y = d.split('-')[0];
                 if (y && /^\d{4}$/.test(y)) years.add(y);
             });
+            if (years.size === 0) {
+                years.add(String(now.getFullYear() - 1));
+                years.add(String(now.getFullYear()));
+                years.add(String(now.getFullYear() + 1));
+            }
             yearSelect.innerHTML = '';
             Array.from(years).sort().forEach(y => {
                 const opt = document.createElement('option');
@@ -331,20 +353,21 @@
             document.title = `DEAR MC - Result Chart — ${monthName}`;
         }
 
+        // ✅ Updated render(): show all days even if no data
         function render() {
             resultBody.innerHTML = '';
-            const dates = Object.keys(allData || {}).sort();
+            const year = filter?.year || new Date().getFullYear();
+            const month = filter?.month || String(new Date().getMonth() + 1).padStart(2, '0');
+            const totalDays = new Date(year, parseInt(month), 0).getDate();
+
             const todayISO = new Date().toISOString().split('T')[0];
             const currentHour = new Date().getHours();
             const rows = [];
 
-            dates.forEach(dateStr => {
-                if (filter && filter.year && filter.month) {
-                    const prefix = `${filter.year}-${filter.month}`;
-                    if (!dateStr.startsWith(prefix)) return;
-                }
-
+            for (let day = 1; day <= totalDays; day++) {
+                const dateStr = `${year}-${month}-${String(day).padStart(2, '0')}`;
                 const tr = document.createElement('tr');
+
                 const tdDate = document.createElement('td');
                 tdDate.textContent = formatDate(dateStr);
                 tr.appendChild(tdDate);
@@ -354,33 +377,34 @@
                     const hour = resultTimes[idx];
                     const isPastDate = dateStr < todayISO;
                     const isToday = dateStr === todayISO;
-                    const canShow = isPastDate || (isToday && currentHour >= hour);
+                    const canShow = isPastDate || (isToday && (currentHour >= hour));
                     const value = canShow ? (allData?.[dateStr]?.[slot]?.result ?? '-') : '-';
                     td.textContent = value;
                     tr.appendChild(td);
                 });
 
                 rows.push(tr);
-            });
+            }
 
-            if (rows.length === 0) {
-                const tr = document.createElement('tr');
-                tr.className = 'empty-row';
-                const td = document.createElement('td');
-                td.colSpan = 9;
-                td.textContent = 'No data for the selected month/year.';
-                tr.appendChild(td);
-                resultBody.appendChild(tr);
-            } else rows.forEach(r => resultBody.appendChild(r));
+            rows.forEach(r => resultBody.appendChild(r));
         }
 
-        const applyFilter = () => { filter = { year: yearSelect.value, month: monthSelect.value }; updateTitle(); render(); };
+        const applyFilter = () => {
+            filter = { year: yearSelect.value, month: monthSelect.value };
+            updateTitle();
+            render();
+        };
+
         applyBtn.addEventListener('click', applyFilter);
         monthSelect.addEventListener('change', applyFilter);
         yearSelect.addEventListener('change', applyFilter);
-        showAllBtn.addEventListener('click', () => { filter = null; updateTitle(); render(); });
+        showAllBtn.addEventListener('click', () => {
+            filter = null;
+            updateTitle();
+            render();
+        });
 
-        // ✅ PNG download: 1600x1600 scaled
+        // ✅ PNG download: Fixed to 1600x1600 and auto-scale content
         downloadBtn.addEventListener('click', async () => {
             const table = document.getElementById('result-table');
             try {
@@ -414,5 +438,6 @@
         });
     </script>
 </body>
+
 
 </html>
