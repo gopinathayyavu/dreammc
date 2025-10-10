@@ -2,14 +2,16 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DEAR MC - Result Chart</title>
     <style>
         :root {
-            --card-width: 100%;
-            --box-size: clamp(36px, 9vw, 60px);
-            --box-font: clamp(1.4rem, 2.8vw, 2rem);
+            --cell-pad-y: 8px;
+            --cell-pad-x: 6px;
+            --col-min: 84px;
+            --font-size: 13px;
+            --font-size-th: 14px;
         }
 
         * {
@@ -31,11 +33,11 @@
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 20px;
-            margin-top: 10px;
+            margin: 10px 0;
+            font-weight: 800;
         }
 
-        /* Sidebar Menu */
+        /* Sidebar */
         .menu-icon {
             position: absolute;
             top: 20px;
@@ -51,7 +53,7 @@
 
         .menu-icon span {
             height: 4px;
-            background-color: #333;
+            background: #333;
             border-radius: 2px;
         }
 
@@ -62,9 +64,9 @@
             width: 250px;
             height: 100%;
             background: linear-gradient(135deg, #f0f8ff, #e6e6fa);
-            box-shadow: 4px 0 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 4px 0 12px rgba(0, 0, 0, .1);
             padding: 60px 20px;
-            transition: left 0.3s ease;
+            transition: left .3s ease;
             z-index: 1000;
         }
 
@@ -79,11 +81,11 @@
             text-decoration: none;
             margin-bottom: 10px;
             font-weight: bold;
-            transition: background 0.2s;
+            transition: background .2s;
         }
 
         .sidebar a:hover {
-            background-color: #ddd;
+            background: #ddd;
         }
 
         .sidebar .close-btn {
@@ -95,70 +97,132 @@
             color: #333;
         }
 
-        h1 {
-            text-align: center;
-            background: -webkit-linear-gradient(#00f0ff, #ff0080);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
+        /* Toolbar */
+        .toolbar {
+            width: 90%;
+            margin: 10px auto 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr auto auto auto;
+            gap: 8px;
+            align-items: center;
         }
 
-        /* Table Style */
+        .toolbar select,
+        .toolbar button {
+            padding: 10px 12px;
+            border: 1px solid #cfe8ff;
+            border-radius: 8px;
+            background: #fff;
+            font-size: 14px;
+        }
+
+        .toolbar button {
+            background: linear-gradient(135deg, #00cfff, #00a8ff);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .toolbar button.secondary {
+            background: #eef7ff;
+            color: #0d6efd;
+            border: 1px solid #d8ecff;
+            font-weight: 700;
+        }
+
+        .toolbar button.neutral {
+            background: #ffffff;
+            color: #0f172a;
+            border: 1px solid #cbd5e1;
+            font-weight: 700;
+        }
+
+        /* Table */
         .table-container {
             width: 90%;
             overflow-x: auto;
-            margin: 0 auto;
+            margin: 8px auto 16px;
         }
 
         table {
             width: 100%;
             min-width: 600px;
             border-collapse: collapse;
-            margin-top: 30px;
-            background-color: white;
-            border-radius: 10px;
+            margin-top: 14px;
+            background: #fff;
+            border: 1px solid #000;
+            border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .1);
+            table-layout: fixed;
         }
 
         th,
         td {
-            border: 1px solid #ddd;
-            padding: 12px 10px;
+            border: 1px solid #000;
+            padding: var(--cell-pad-y) var(--cell-pad-x);
             text-align: center;
-            font-size: 14px;
+            vertical-align: middle;
+            min-width: var(--col-min);
         }
 
         th {
-            background-color: #00cfff;
+            background: #00a8ff;
             color: #fff;
-            font-size: 15px;
+            font-size: var(--font-size-th);
+            font-weight: 800;
+        }
+
+        td {
+            font-size: var(--font-size);
+            color: #0f172a;
+            font-weight: 700;
         }
 
         tr:nth-child(even) td {
-            background-color: #f9f9f9;
+            background: #f7fbff;
         }
 
-        @media screen and (max-width: 600px) {
+        tbody tr td:first-child {
+            background: #00a8ff;
+            color: #fff;
+            font-weight: 800;
+        }
+
+        .empty-row td {
+            color: #64748b;
+            font-style: italic;
+            font-weight: 600;
+        }
+
+        @media (max-width:600px) {
+            .toolbar {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .toolbar button {
+                grid-column: span 1;
+            }
 
             th,
             td {
                 font-size: 12px;
-                padding: 10px 6px;
+                padding: 8px 6px;
+            }
+
+            :root {
+                --col-min: 72px;
             }
         }
     </style>
 </head>
 
 <body>
-    <!-- Sidebar Trigger Icon -->
     <div class="menu-icon" onclick="document.querySelector('.sidebar').classList.add('active')">
-        <span></span>
-        <span></span>
-        <span></span>
+        <span></span><span></span><span></span>
     </div>
 
-    <!-- Sidebar -->
     <div class="sidebar">
         <span class="close-btn" onclick="document.querySelector('.sidebar').classList.remove('active')">&times;</span>
         <a href="index.html">Home</a>
@@ -167,10 +231,23 @@
         <a href="mc.html">MC</a>
         <a href="results.html">Result</a>
     </div>
+
     <h1>DEAR MC - Result Chart</h1>
+
+    <div class="toolbar">
+        <select id="monthSelect" aria-label="Select month"></select>
+        <select id="yearSelect" aria-label="Select year"></select>
+        <button id="applyBtn">Apply</button>
+        <button id="showAllBtn" class="secondary">Show All</button>
+        <button id="downloadPngBtn" class="neutral">Download Table (PNG)</button>
+    </div>
+
     <div class="table-container">
         <table id="result-table">
             <thead>
+                <tr>
+                    <th colspan="9" style="font-size:18px; padding:14px 0;">Result Chart</th>
+                </tr>
                 <tr>
                     <th>Date</th>
                     <th>10:00 AM</th>
@@ -183,48 +260,156 @@
                     <th>08:00 PM</th>
                 </tr>
             </thead>
-            <tbody id="result-body">
-                <!-- JS will populate rows here -->
-            </tbody>
+            <tbody id="result-body"></tbody>
         </table>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
+
     <script type="module">
         import { db } from './firebase-init.js';
         import { ref, onValue } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js';
 
         const timeSlots = ['10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '05:00 PM', '06:00 PM', '07:00 PM', '08:00 PM'];
-        const resultTimes = [10, 11, 12, 13, 17, 18, 19, 20]; // 24-hour format
+        const resultTimes = [10, 11, 12, 13, 17, 18, 19, 20];
 
         const resultBody = document.getElementById('result-body');
+        const monthSelect = document.getElementById('monthSelect');
+        const yearSelect = document.getElementById('yearSelect');
+        const applyBtn = document.getElementById('applyBtn');
+        const showAllBtn = document.getElementById('showAllBtn');
+        const downloadBtn = document.getElementById('downloadPngBtn');
+
+        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        monthNames.forEach((m, i) => {
+            const opt = document.createElement('option');
+            opt.value = String(i + 1).padStart(2, '0');
+            opt.textContent = m;
+            monthSelect.appendChild(opt);
+        });
+
+        const now = new Date();
+        monthSelect.value = String(now.getMonth() + 1).padStart(2, '0');
+
+        let allData = {};
+        let filter = { year: String(now.getFullYear()), month: monthSelect.value };
 
         const rootRef = ref(db, 'lottery');
         onValue(rootRef, (snapshot) => {
-            const data = snapshot.val();
+            allData = snapshot.val() || {};
+            populateYearSelect(allData);
+            if (![...yearSelect.options].some(o => o.value === filter.year)) {
+                filter.year = yearSelect.value || String(now.getFullYear());
+            }
+            updateTitle();
+            render();
+        });
+
+        function populateYearSelect(data) {
+            const years = new Set();
+            Object.keys(data || {}).forEach(d => {
+                const y = d.split('-')[0];
+                if (y && /^\d{4}$/.test(y)) years.add(y);
+            });
+            yearSelect.innerHTML = '';
+            Array.from(years).sort().forEach(y => {
+                const opt = document.createElement('option');
+                opt.value = y;
+                opt.textContent = y;
+                yearSelect.appendChild(opt);
+            });
+            if (!yearSelect.value) yearSelect.value = String(now.getFullYear());
+        }
+
+        function formatDate(dateStr) {
+            const [y, m, d] = dateStr.split('-');
+            return `${d}/${m}/${y}`;
+        }
+
+        function updateTitle() {
+            const monthName = monthNames[parseInt(monthSelect.value, 10) - 1];
+            document.title = `DEAR MC - Result Chart — ${monthName}`;
+        }
+
+        function render() {
             resultBody.innerHTML = '';
+            const dates = Object.keys(allData || {}).sort();
+            const todayISO = new Date().toISOString().split('T')[0];
+            const currentHour = new Date().getHours();
+            const rows = [];
 
-            const now = new Date();
-            const currentHour = now.getHours();
-            const currentDate = now.toISOString().split('T')[0];
+            dates.forEach(dateStr => {
+                if (filter && filter.year && filter.month) {
+                    const prefix = `${filter.year}-${filter.month}`;
+                    if (!dateStr.startsWith(prefix)) return;
+                }
 
-            if (data) {
-                Object.keys(data).forEach(date => {
-                    const row = document.createElement('tr');
-                    const dateCell = document.createElement('td');
-                    dateCell.textContent = date;
-                    row.appendChild(dateCell);
+                const tr = document.createElement('tr');
+                const tdDate = document.createElement('td');
+                tdDate.textContent = formatDate(dateStr);
+                tr.appendChild(tdDate);
 
-                    timeSlots.forEach((slot, index) => {
-                        const cell = document.createElement('td');
-                        const hour = resultTimes[index];
-
-                        const show = (date < currentDate) || (date === currentDate && currentHour >= hour);
-                        const value = show ? (data[date][slot]?.result || '-') : '-';
-                        cell.textContent = value;
-                        row.appendChild(cell);
-                    });
-
-                    resultBody.appendChild(row);
+                timeSlots.forEach((slot, idx) => {
+                    const td = document.createElement('td');
+                    const hour = resultTimes[idx];
+                    const isPastDate = dateStr < todayISO;
+                    const isToday = dateStr === todayISO;
+                    const canShow = isPastDate || (isToday && currentHour >= hour);
+                    const value = canShow ? (allData?.[dateStr]?.[slot]?.result ?? '-') : '-';
+                    td.textContent = value;
+                    tr.appendChild(td);
                 });
+
+                rows.push(tr);
+            });
+
+            if (rows.length === 0) {
+                const tr = document.createElement('tr');
+                tr.className = 'empty-row';
+                const td = document.createElement('td');
+                td.colSpan = 9;
+                td.textContent = 'No data for the selected month/year.';
+                tr.appendChild(td);
+                resultBody.appendChild(tr);
+            } else rows.forEach(r => resultBody.appendChild(r));
+        }
+
+        const applyFilter = () => { filter = { year: yearSelect.value, month: monthSelect.value }; updateTitle(); render(); };
+        applyBtn.addEventListener('click', applyFilter);
+        monthSelect.addEventListener('change', applyFilter);
+        yearSelect.addEventListener('change', applyFilter);
+        showAllBtn.addEventListener('click', () => { filter = null; updateTitle(); render(); });
+
+        // ✅ PNG download: 1600x1600 scaled
+        downloadBtn.addEventListener('click', async () => {
+            const table = document.getElementById('result-table');
+            try {
+                const scaleX = 1600 / table.offsetWidth;
+                const scaleY = 1600 / table.offsetHeight;
+                const scale = Math.min(scaleX, scaleY);
+
+                const dataUrl = await window.htmlToImage.toPng(table, {
+                    width: 1600,
+                    height: 1600,
+                    style: {
+                        transform: `scale(${scale})`,
+                        transformOrigin: 'top left',
+                        background: '#ffffff'
+                    },
+                    pixelRatio: 1,
+                    cacheBust: true,
+                    skipFonts: true
+                });
+
+                const a = document.createElement('a');
+                a.href = dataUrl;
+                a.download = `result-table-${new Date().toISOString().slice(0, 10)}.png`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            } catch (e) {
+                console.error('PNG export failed:', e);
+                alert('PNG export failed: ' + e.message);
             }
         });
     </script>

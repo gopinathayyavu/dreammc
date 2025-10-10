@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DEAR MC — Bulk Upload (Image → Firebase)</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --ink:#fff; --muted:#b6c2d1; --panel:rgba(255,255,255,.08);
+      --glass-brd:rgba(255,255,255,.25); --accent:#00f0ff; --accent2:#ff0080;
+      --radius:16px; --elev:0 14px 40px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:Poppins, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color:var(--ink); background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+      min-height:100vh; padding:24px;
+    }
+    .wrap{ max-width:1200px; margin:0 auto; }
+    .head{ display:flex; gap:16px; align-items:center; justify-content:space-between; flex-wrap:wrap; margin-bottom:16px; }
+    .card{ background:var(--panel); border:1px solid var(--glass-brd); border-radius:var(--radius); box-shadow:var(--elev); padding:16px; }
+    .row{ display:flex; gap:16px; flex-wrap:wrap; }
+    .row > *{ flex:1 1 260px; }
+    .controls label{ display:block; font-size:12px; color:var(--muted); margin-bottom:6px; }
+    input[type="file"], input[type="date"], select{
+      width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--glass-brd);
+      background:rgba(255,255,255,.06); color:#fff; outline:none;
+    }
+    .btn{
+      appearance:none; border:0; border-radius:12px; padding:12px 18px; font-weight:700; cursor:pointer;
+      background:var(--accent); color:#111; transition:.2s ease;
+    }
+    .btn:hover{ background:var(--accent2); color:#fff; transform:translateY(-1px); }
+    .status{ margin-top:10px; color:var(--muted); font-size:13px }
+    .grid-wrap{ margin-top:18px; overflow:auto; }
+    table{ width:100%; border-collapse:collapse; min-width:900px; }
+    th, td{ border:1px solid rgba(255,255,255,.15); padding:8px 10px; text-align:center; white-space:nowrap; }
+    th{ background:rgba(255,255,255,.10); position:sticky; top:0; }
+    td[contenteditable="true"]{ background:rgba(0,0,0,.25); outline:none; }
+    .ok{ color:#67f6a5 } .warn{ color:#ffd166 } .err{ color:#ff8fa3 }
+    .legend{ font-size:12px; color:var(--muted); margin-top:6px; }
+    .preview{ margin-top:10px; display:none }
+    textarea{
+      width:100%; min-height:140px; background:rgba(0,0,0,.35); color:#bfe8ff; border:1px solid var(--glass-brd);
+      border-radius:10px; padding:10px; font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="head">
+      <h1 style="margin:0">DEAR MC — Bulk Image Uploader</h1>
+      <div class="legend">Image → OCR (with preprocessing) → Parse → Review → Upload</div>
+    </div>
+
+    <div class="card">
+      <div class="row controls">
+        <div>
+          <label>Pick date</label>
+          <input type="date" id="dateInput">
+        </div>
+
+        <div>
+          <label>Dataset type</label>
+          <select id="dataset">
+            <option value="machine" selected>Machine numbers</option>
+            <option value="result">Results</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Upload table image</label>
+          <input type="file" id="imgInput" accept="image/*">
+        </div>
+
+        <div>
+          <label>OCR mode</label>
+          <select id="psm">
+            <option value="6" selected>PSM 6 — Assume a uniform block</option>
+            <option value="4">PSM 4 — Single column of text</option>
+          </select>
+        </div>
+
+        <div style="display:flex; gap:10px; align-items:flex-end">
+          <button class="btn" id="btnOCR">Run OCR</button>
+          <button class="btn" id="btnUpload" disabled>Upload to Firebase</button>
+          <button class="btn" id="btnToggleRaw" type="button">Show Raw OCR</button>
+        </div>
+      </div>
+
+      <div class="status" id="status">Status: idle</div>
+
+      <div class="preview" id="rawBox">
+        <label class="legend">Raw OCR output (debug)</label>
+        <textarea id="rawText" readonly></textarea>
+      </div>
+
+      <div class="grid-wrap" id="gridWrap" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- Tesseract.js -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+  <!-- Your Firebase init must export `app` and `db` -->
+  <script type="module" src="./firebase-init.js"></script>
+  <script type="module" src="bulk.js"></script>
+</body>
+</html>
