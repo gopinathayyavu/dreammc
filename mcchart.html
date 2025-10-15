@@ -284,12 +284,20 @@
     <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
 
     <script type="module">
+        // ==============================
+        // DEAR MC — Machine Chart (Full JS)
+        // Firebase live render + Robust PNG export (no mobile cropping, no extra top space)
+        // ==============================
+
         import { db } from './firebase-init.js';
         import { ref, onValue } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js';
 
+        // ---------- Config ----------
         const timeSlots = ['10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '05:00 PM', '06:00 PM', '07:00 PM', '08:00 PM'];
-        const resultTimes = [10, 11, 12, 13, 17, 18, 19, 20];
+        const resultTimes = [10, 11, 12, 13, 17, 18, 19, 20]; // 24h format aligned to timeSlots
+        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
+        // ---------- DOM ----------
         const mcBody = document.getElementById('mc-body');
         const monthSelect = document.getElementById('monthSelect');
         const yearSelect = document.getElementById('yearSelect');
@@ -297,7 +305,7 @@
         const showAllBtn = document.getElementById('showAllBtn');
         const downloadBtn = document.getElementById('downloadPngBtn');
 
-        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        // Fill month dropdown
         monthNames.forEach((m, i) => {
             const opt = document.createElement('option');
             opt.value = String(i + 1).padStart(2, '0');
@@ -305,15 +313,19 @@
             monthSelect.appendChild(opt);
         });
 
+        // Defaults to current month/year
         const now = new Date();
         monthSelect.value = String(now.getMonth() + 1).padStart(2, '0');
 
         let allData = {};
         let filter = { year: String(now.getFullYear()), month: monthSelect.value };
+
+        // ---------- Firebase Live Data ----------
         const rootRef = ref(db, 'lottery');
         onValue(rootRef, (snapshot) => {
             allData = snapshot.val() || {};
             populateYearSelect(allData);
+
             if (![...yearSelect.options].some(o => o.value === filter.year)) {
                 filter.year = yearSelect.value || String(now.getFullYear());
             }
@@ -321,17 +333,20 @@
             render();
         });
 
+        // ---------- Helpers ----------
         function populateYearSelect(data) {
             const years = new Set();
             Object.keys(data || {}).forEach(d => {
                 const y = d.split('-')[0];
                 if (y && /^\d{4}$/.test(y)) years.add(y);
             });
+
             if (years.size === 0) {
                 years.add(String(now.getFullYear() - 1));
                 years.add(String(now.getFullYear()));
                 years.add(String(now.getFullYear() + 1));
             }
+
             yearSelect.innerHTML = '';
             Array.from(years).sort().forEach(y => {
                 const opt = document.createElement('option');
@@ -339,6 +354,7 @@
                 opt.textContent = y;
                 yearSelect.appendChild(opt);
             });
+
             if (!yearSelect.value) yearSelect.value = String(now.getFullYear());
         }
 
@@ -352,15 +368,18 @@
             document.title = `DEAR MC - Machine Chart — ${monthName}`;
         }
 
-        // ✅ Updated render(): show all days even if no data
+        // ---------- Render ----------
         function render() {
             mcBody.innerHTML = '';
+
             const year = filter?.year || new Date().getFullYear();
             const month = filter?.month || String(new Date().getMonth() + 1).padStart(2, '0');
-            const totalDays = new Date(year, parseInt(month), 0).getDate();
+            const totalDays = new Date(year, parseInt(month, 10), 0).getDate();
 
-            const todayISO = new Date().toISOString().split('T')[0];
-            const currentHour = new Date().getHours();
+            const today = new Date();
+            const todayISO = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString().split('T')[0];
+            const currentHour = today.getHours();
+
             const rows = [];
 
             for (let day = 1; day <= totalDays; day++) {
@@ -374,9 +393,14 @@
                 timeSlots.forEach((slot, idx) => {
                     const td = document.createElement('td');
                     const hour = resultTimes[idx];
+
                     const isPastDate = dateStr < todayISO;
                     const isToday = dateStr === todayISO;
+
+                    // Reveal logic (same as your original): past days show,
+                    // today shows from one hour before the slot time.
                     const canShow = isPastDate || (isToday && (currentHour >= (hour - 1)));
+
                     const value = canShow ? (allData?.[dateStr]?.[slot]?.machine ?? '-') : '-';
                     td.textContent = value;
                     tr.appendChild(td);
@@ -388,6 +412,7 @@
             rows.forEach(r => mcBody.appendChild(r));
         }
 
+        // ---------- Filters ----------
         const applyFilter = () => {
             filter = { year: yearSelect.value, month: monthSelect.value };
             updateTitle();
@@ -397,44 +422,92 @@
         applyBtn.addEventListener('click', applyFilter);
         monthSelect.addEventListener('change', applyFilter);
         yearSelect.addEventListener('change', applyFilter);
+
+        // Note: This resets to current month/year view (same as your original behavior)
         showAllBtn.addEventListener('click', () => {
             filter = null;
             updateTitle();
             render();
         });
 
-        // ✅ PNG download: Fixed to 1600x1600 and auto-scale content
-        downloadBtn.addEventListener('click', async () => {
-            const table = document.getElementById('mc-table');
-            try {
-                const scaleX = 1600 / table.offsetWidth;
-                const scaleY = 1600 / table.offsetHeight;
-                const scale = Math.min(scaleX, scaleY);
+        // ---------- Robust PNG Export (no extra top space; add tiny bottom buffer) ----------
+        function downloadDataUrl(dataUrl, filename) {
+            const a = document.createElement('a');
+            a.href = dataUrl;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        }
 
-                const dataUrl = await window.htmlToImage.toPng(table, {
-                    width: 1600,
-                    height: 1600,
-                    style: {
-                        transform: `scale(${scale})`,
-                        transformOrigin: 'top left',
-                        background: '#ffffff'
-                    },
-                    pixelRatio: 1,
+        async function exportTableAsPNG() {
+            const table = document.getElementById('mc-table');
+
+            // 1) Deep clone into an off-screen wrapper
+            const clone = table.cloneNode(true);
+            const wrapper = document.createElement('div');
+            wrapper.style.position = 'fixed';
+            wrapper.style.left = '-100000px'; // fully off-screen
+            wrapper.style.top = '0';
+            wrapper.style.zIndex = '-1';
+            wrapper.style.background = '#ffffff';
+            wrapper.style.margin = '0';
+            wrapper.style.padding = '0';
+            wrapper.style.border = '0';
+            wrapper.appendChild(clone);
+            document.body.appendChild(wrapper);
+
+            // 2) Reset clone spacing to avoid phantom top padding
+            clone.style.margin = '0';
+            clone.style.padding = '0';
+            clone.style.width = 'auto';
+            clone.style.height = 'auto';
+            clone.style.maxWidth = 'none';
+            clone.style.maxHeight = 'none';
+            clone.style.transform = 'none';
+            clone.style.transformOrigin = 'top left';
+            clone.style.background = '#ffffff';
+            // ensure tight borders
+            clone.style.borderCollapse = 'collapse';
+
+            // 3) Wait for fonts to be loaded
+            if (document.fonts && document.fonts.ready) {
+                try { await document.fonts.ready; } catch { }
+            }
+
+            // 4) Measure natural content size
+            const width = Math.ceil(clone.scrollWidth);
+            const height = Math.ceil(clone.scrollHeight);
+
+            // Add a small bottom buffer to avoid clipping the last row border
+            const safeHeight = height + 10;
+
+            try {
+                const dataUrl = await window.htmlToImage.toPng(clone, {
+                    width,
+                    height: safeHeight,
+                    pixelRatio: 2,
+                    backgroundColor: '#ffffff',
                     cacheBust: true,
-                    skipFonts: true
+                    style: {
+                        margin: '0',
+                        padding: '0',
+                        transform: 'none',
+                        background: '#ffffff'
+                    }
                 });
 
-                const a = document.createElement('a');
-                a.href = dataUrl;
-                a.download = `mc-table-${new Date().toISOString().slice(0, 10)}.png`;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
+                downloadDataUrl(dataUrl, `mc-table-${new Date().toISOString().slice(0, 10)}.png`);
             } catch (e) {
                 console.error('PNG export failed:', e);
                 alert('PNG export failed: ' + e.message);
+            } finally {
+                wrapper.remove();
             }
-        });
+        }
+
+        downloadBtn.addEventListener('click', exportTableAsPNG);
+
     </script>
 </body>
 
