@@ -16,6 +16,7 @@
             --line-strong-w: 2px;
         }
 
+        /* Reset & body */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -24,14 +25,14 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #e7f8ff, #ffffff);
+            background: linear-gradient(135deg, #eef8ff, #ffffff);
             color: #222;
             overflow-x: hidden;
         }
 
-        h1 {
+        .header {
             text-align: center;
-            background: -webkit-linear-gradient(#00f0ff, #ff0080);
+            background: -webkit-linear-gradient(#00d5ff, #ff66a3);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -39,7 +40,7 @@
             font-weight: 800;
         }
 
-        /* Sidebar */
+        /* Sidebar (unchanged) */
         .menu-icon {
             position: absolute;
             top: 20px;
@@ -65,7 +66,7 @@
             left: -250px;
             width: 250px;
             height: 100%;
-            background: linear-gradient(135deg, #f0f8ff, #e6e6fa);
+            background: linear-gradient(135deg, #f7fbff, #edeaff);
             box-shadow: 4px 0 12px rgba(0, 0, 0, .1);
             padding: 60px 20px;
             transition: left .3s ease;
@@ -138,20 +139,6 @@
             border: 1px solid #cbd5e1;
         }
 
-        .dwn-btn {
-            background: linear-gradient(135deg, #00cfff, #00a8ff);
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            font-weight: 700;
-            padding: 10px;
-            border-radius: 8px;
-        }
-
-        .dwn-btn:hover {
-            background: linear-gradient(135deg, #00a8ff, #0080ff);
-        }
-
         /* Table */
         .table-container {
             width: 75%;
@@ -159,7 +146,6 @@
             overflow-x: auto;
         }
 
-        /* Use separate borders so nothing clips in PNG */
         table {
             width: auto;
             min-width: 560px;
@@ -168,11 +154,12 @@
             margin-top: 14px;
             background: #fff;
             border: var(--line-strong-w) solid var(--line-strong);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, .1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .08);
             margin-left: auto;
             margin-right: auto;
         }
 
+        /* Header & cells */
         th,
         td {
             border: var(--line-strong-w) solid var(--line-strong);
@@ -181,39 +168,50 @@
             vertical-align: middle;
             min-width: var(--col-min);
             white-space: nowrap;
-            /* keep content inside cells */
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
         th {
-            background: #00a8ff;
+            background: #57c7ff;
+            /* lighter blue header */
             color: #fff;
             font-size: 20px;
             font-weight: 900;
+            letter-spacing: 0.5px;
         }
 
         td {
-            font-size: 20px;
+            font-size: 19px;
             color: #0f172a;
-            font-weight: 900;
+            font-weight: 950;
+            /* bolder text */
         }
 
+        tbody td:not(:first-child) {
+            font-size: 21px;
+            /* slightly larger */
+            font-weight: 1000;
+            /* extra bold for numbers */
+        }
+
+        /* Row styles */
         tr:nth-child(even) td {
-            background: #8cc3fa;
+            background: #bfe4ff;
+            /* lighter zebra row */
         }
 
         tbody tr td:first-child {
-            background: #00a8ff;
+            background: #00baff;
+            /* lighter first-column blue */
             color: #fff;
-            font-weight: 900;
+            font-weight: 950;
         }
 
+        /* Misc */
         .col-date {
             min-width: 130px;
         }
-
-        /* enough room for dd/mm/yyyy */
 
         .empty-row td {
             color: #64748b;
@@ -221,6 +219,21 @@
             font-weight: 800;
         }
 
+        .dwn-btn {
+            background: linear-gradient(135deg, #00cfff, #00a8ff);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-weight: 800;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .dwn-btn:hover {
+            background: linear-gradient(135deg, #00a8ff, #0080ff);
+        }
+
+        /* Responsive */
         @media (max-width:900px) {
 
             .toolbar,
@@ -269,7 +282,7 @@
         <a href="results.html">Result</a>
     </div>
 
-    <h1>DEAR MC - Machine Number Chart</h1>
+    <h1 class="header">DEAR MC - Machine Number Chart</h1>
 
     <div class="toolbar">
         <select id="monthSelect" aria-label="Select month"></select>
@@ -282,7 +295,9 @@
         <table id="mc-table">
             <thead>
                 <tr>
-                    <th colspan="9" style="font-size:18px; padding:14px 0;">Machine Number Chart</th>
+                    <th colspan="9" style="font-size:18px; padding:14px 0;">
+                        <h1>Dear-Mc Machine Number Chart</h1>
+                    </th>
                 </tr>
                 <tr>
                     <th class="col-date">Date</th>
