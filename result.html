@@ -2,502 +2,544 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DEAR-Result Chart</title>
-    <style>
-        :root {
-            --cell-pad-y: 8px;
-            --cell-pad-x: 6px;
-            --col-min: 84px;
-            --font-size: 13px;
-            --font-size-th: 14px;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DEAR MC - Result Chart</title>
+  <style>
+    :root {
+      --cell-pad-y: 8px;
+      --cell-pad-x: 6px;
+      --col-min: 78px;
+      /* compact column width */
+      --font-size: 13px;
+      --font-size-th: 14px;
+      --line-strong: #000000;
+      /* strong borders like Machine Chart */
+      --line-strong-w: 2px;
+    }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #e7f8ff, #ffffff);
-            color: #222;
-            overflow-x: hidden;
-        }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #e7f8ff, #ffffff);
+      color: #222;
+      overflow-x: hidden;
+    }
 
-        h1 {
-            text-align: center;
-            background: -webkit-linear-gradient(#00f0ff, #ff0080);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin: 10px 0;
-            font-weight: 800;
-        }
+    h1 {
+      text-align: center;
+      background: -webkit-linear-gradient(#00f0ff, #ff0080);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 10px 0;
+      font-weight: 800;
+    }
 
-        /* Sidebar */
-        .menu-icon {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            width: 30px;
-            height: 25px;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            z-index: 1100;
-        }
+    /* Sidebar */
+    .menu-icon {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      width: 30px;
+      height: 25px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      z-index: 1100;
+    }
 
-        .menu-icon span {
-            height: 4px;
-            background: #333;
-            border-radius: 2px;
-        }
+    .menu-icon span {
+      height: 4px;
+      background: #333;
+      border-radius: 2px;
+    }
 
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: -250px;
-            width: 250px;
-            height: 100%;
-            background: linear-gradient(135deg, #f0f8ff, #e6e6fa);
-            box-shadow: 4px 0 12px rgba(0, 0, 0, .1);
-            padding: 60px 20px;
-            transition: left .3s ease;
-            z-index: 1000;
-        }
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 250px;
+      height: 100%;
+      background: linear-gradient(135deg, #f0f8ff, #e6e6fa);
+      box-shadow: 4px 0 12px rgba(0, 0, 0, .1);
+      padding: 60px 20px;
+      transition: left .3s ease;
+      z-index: 1000;
+    }
 
-        .sidebar.active {
-            left: 0;
-        }
+    .sidebar.active {
+      left: 0;
+    }
 
-        .sidebar a {
-            display: block;
-            padding: 12px;
-            color: #333;
-            text-decoration: none;
-            margin-bottom: 10px;
-            font-weight: bold;
-            transition: background .2s;
-        }
+    .sidebar a {
+      display: block;
+      padding: 12px;
+      color: #333;
+      text-decoration: none;
+      margin-bottom: 10px;
+      font-weight: bold;
+      transition: background .2s;
+    }
 
-        .sidebar a:hover {
-            background: #ddd;
-        }
+    .sidebar a:hover {
+      background: #ddd;
+    }
 
-        .sidebar .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            font-size: 24px;
-            cursor: pointer;
-            color: #333;
-        }
+    .sidebar .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 24px;
+      cursor: pointer;
+      color: #333;
+    }
 
-        /* Toolbar */
-        .toolbar {
-            width: 90%;
-            margin: 10px auto 0;
-            display: grid;
-            grid-template-columns: 1fr 1fr auto auto;
-            gap: 8px;
-            align-items: center;
-        }
+    /* Toolbar */
+    .toolbar {
+      width: 75%;
+      margin: 10px auto 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr auto auto;
+      gap: 8px;
+      align-items: center;
+    }
 
-        .toolbar select,
-        .toolbar button {
-            padding: 10px 12px;
-            border: 1px solid #cfe8ff;
-            border-radius: 8px;
-            background: #fff;
-            font-size: 14px;
-        }
+    .toolbar select,
+    .toolbar button {
+      padding: 10px 12px;
+      border: 1px solid #cfe8ff;
+      border-radius: 8px;
+      background: #fff;
+      font-size: 14px;
+      font-weight: 700;
+    }
 
-        .toolbar button {
-            background: linear-gradient(135deg, #00cfff, #00a8ff);
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            font-weight: 700;
-        }
+    .toolbar button {
+      background: linear-gradient(135deg, #00cfff, #00a8ff);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
 
-        .toolbar button.secondary {
-            background: #eef7ff;
-            color: #0d6efd;
-            border: 1px solid #d8ecff;
-            font-weight: 700;
-        }
+    .toolbar button.secondary {
+      background: #eef7ff;
+      color: #0d6efd;
+      border: 1px solid #d8ecff;
+    }
 
-        .toolbar button.neutral {
-            background: #ffffff;
-            color: #0f172a;
-            border: 1px solid #cbd5e1;
-            font-weight: 700;
-        }
+    .toolbar button.neutral {
+      background: #ffffff;
+      color: #0f172a;
+      border: 1px solid #cbd5e1;
+    }
 
-        .dwn-btn {
-            background: linear-gradient(135deg, #00cfff, #00a8ff);
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            font-weight: 700;
-            padding: 10px;
-            border-radius: 8px;
-        }
+    .dwn-btn {
+      background: linear-gradient(135deg, #00cfff, #00a8ff);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+      padding: 10px;
+      border-radius: 8px;
+    }
 
-        .dwn-btn:hover {
-            background: linear-gradient(135deg, #00a8ff, #0080ff);
-        }
+    .dwn-btn:hover {
+      background: linear-gradient(135deg, #00a8ff, #0080ff);
+    }
 
-        /* Table */
-        .table-container {
-            width: 90%;
-            overflow-x: auto;
-            margin: 8px auto 16px;
-        }
+    /* Table */
+    .table-container {
+      width: 75%;
+      margin: 8px auto 16px;
+      overflow-x: auto;
+    }
 
-        table {
-            width: 100%;
-            min-width: 600px;
-            border-collapse: collapse;
-            margin-top: 14px;
-            background: #fff;
-            border: 1px solid #000;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, .1);
-            table-layout: fixed;
-        }
+    /* IMPORTANT for PNG export: use separate borders, no spacing, nowrap cells */
+    table {
+      width: auto;
+      min-width: 560px;
+      border-collapse: separate;
+      /* prevents border clipping in exports */
+      border-spacing: 0;
+      margin-top: 14px;
+      background: #fff;
+      border: var(--line-strong-w) solid var(--line-strong);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, .1);
+      margin-left: auto;
+      margin-right: auto;
+      table-layout: auto;
+      /* allow natural width for nowrap cells */
+    }
 
-        th,
-        td {
-            border: 1px solid #000;
-            padding: var(--cell-pad-y) var(--cell-pad-x);
-            text-align: center;
-            vertical-align: middle;
-            min-width: var(--col-min);
-        }
+    th,
+    td {
+      border: var(--line-strong-w) solid var(--line-strong);
+      padding: var(--cell-pad-y) var(--cell-pad-x);
+      text-align: center;
+      vertical-align: middle;
+      min-width: var(--col-min);
+      white-space: nowrap;
+      /* keep content inside the cell */
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-        th {
-            background: #00a8ff;
-            color: #fff;
-            font-size: var(--font-size-th);
-            font-weight: 800;
-        }
+    th {
+      background: #00a8ff;
+      color: #fff;
+      font-size: 20px;
+      font-weight: 900;
+    }
 
-        td {
-            font-size: var(--font-size);
-            color: #0f172a;
-            font-weight: 700;
-        }
+    td {
+      font-size: 20px;
+      color: #0f172a;
+      font-weight: 900;
+    }
 
-        tr:nth-child(even) td {
-            background: #f7fbff;
-        }
+    /* Alternating row & first-col styles */
+    tr:nth-child(even) td {
+      background: #8cc3fa;
+    }
 
-        tbody tr td:first-child {
-            background: #00a8ff;
-            color: #fff;
-            font-weight: 800;
-        }
+    tbody tr td:first-child {
+      background: #00a8ff;
+      color: #fff;
+      font-weight: 900;
+    }
 
-        .empty-row td {
-            color: #64748b;
-            font-style: italic;
-            font-weight: 600;
-        }
+    .col-date {
+      min-width: 130px;
+    }
 
-        @media (max-width:600px) {
-            .toolbar {
-                grid-template-columns: 1fr 1fr;
-            }
+    /* safe width for dd/mm/yyyy */
 
-            .toolbar button {
-                grid-column: span 1;
-            }
+    .empty-row td {
+      color: #64748b;
+      font-style: italic;
+      font-weight: 800;
+    }
 
-            th,
-            td {
-                font-size: 12px;
-                padding: 8px 6px;
-            }
+    @media (max-width:900px) {
 
-            :root {
-                --col-min: 72px;
-            }
-        }
-    </style>
+      .toolbar,
+      .table-container {
+        width: 90%;
+      }
+    }
+
+    @media (max-width:600px) {
+      .toolbar {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .toolbar button {
+        grid-column: span 1;
+      }
+
+      th,
+      td {
+        font-size: 12px;
+        padding: 8px 6px;
+      }
+
+      :root {
+        --col-min: 72px;
+      }
+
+      .col-date {
+        min-width: 112px;
+      }
+    }
+  </style>
 </head>
 
 <body>
-    <div class="menu-icon" onclick="document.querySelector('.sidebar').classList.add('active')">
-        <span></span><span></span><span></span>
-    </div>
+  <div class="menu-icon" onclick="document.querySelector('.sidebar').classList.add('active')">
+    <span></span><span></span><span></span>
+  </div>
 
-    <div class="sidebar">
-        <span class="close-btn" onclick="document.querySelector('.sidebar').classList.remove('active')">&times;</span>
-        <a href="index.html">Home</a>
-        <a href="result.html">Result Chart</a>
-        <a href="mcchart.html">MC Chart</a>
-        <a href="mc.html">MC</a>
-        <a href="results.html">Result</a>
-    </div>
+  <div class="sidebar">
+    <span class="close-btn" onclick="document.querySelector('.sidebar').classList.remove('active')">&times;</span>
+    <a href="index.html">Home</a>
+    <a href="result.html">Result Chart</a>
+    <a href="mcchart.html">MC Chart</a>
+    <a href="mc.html">MC</a>
+    <a href="results.html">Result</a>
+  </div>
 
-    <h1>DEAR MC - Result Chart</h1>
+  <h1>DEAR MC - Result Chart</h1>
 
-    <div class="toolbar">
-        <select id="monthSelect" aria-label="Select month"></select>
-        <select id="yearSelect" aria-label="Select year"></select>
-        <button id="applyBtn">Apply</button>
-        <button id="showAllBtn" class="secondary" title="Show all dates (no filter)">Show All</button>
-    </div>
+  <div class="toolbar">
+    <select id="monthSelect" aria-label="Select month"></select>
+    <select id="yearSelect" aria-label="Select year"></select>
+    <button id="applyBtn">Apply</button>
+    <button id="showAllBtn" class="secondary" title="Show all dates (no filter)">Show All</button>
+  </div>
 
-    <div class="table-container">
-        <table id="result-table">
-            <thead>
-                <tr>
-                    <th colspan="9" style="font-size:18px; padding:14px 0;">DEARMC - Result Chart</th>
-                </tr>
-                <tr>
-                    <th>Date</th>
-                    <th>10:00 AM</th>
-                    <th>11:00 AM</th>
-                    <th>12:00 PM</th>
-                    <th>01:00 PM</th>
-                    <th>05:00 PM</th>
-                    <th>06:00 PM</th>
-                    <th>07:00 PM</th>
-                    <th>08:00 PM</th>
-                </tr>
-            </thead>
-            <tbody id="result-body"></tbody>
-        </table>
-    </div>
+  <div class="table-container">
+    <table id="result-table">
+      <thead>
+        <tr>
+          <th colspan="9" style="font-size:18px; padding:14px 0;">DEARMC - Result Chart</th>
+        </tr>
+        <tr>
+          <th class="col-date">Date</th>
+          <th>10:00 AM</th>
+          <th>11:00 AM</th>
+          <th>12:00 PM</th>
+          <th>01:00 PM</th>
+          <th>05:00 PM</th>
+          <th>06:00 PM</th>
+          <th>07:00 PM</th>
+          <th>08:00 PM</th>
+        </tr>
+      </thead>
+      <tbody id="result-body"></tbody>
+    </table>
+  </div>
 
-    <div style="text-align:center; margin-bottom:20px;">
-        <button id="downloadPngBtn" class="dwn-btn">Download</button>
-    </div>
+  <div style="text-align:center; margin-bottom:20px;">
+    <button id="downloadPngBtn" class="dwn-btn">Download</button>
+  </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
 
-    <script type="module">
-        // ==============================
-        // DEAR MC — Result Chart (Refactor)
-        // Matches Machine Chart structure; keeps value logic intact (uses .result)
-        // Robust PNG export using off-screen clone (no cropping/extra spacing)
-        // ==============================
+  <script type="module">
+    // ==============================
+    // DEAR MC — Result Chart
+    // ==============================
 
-        import { db } from './firebase-init.js';
-        import { ref, onValue } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js';
+    import { db } from './firebase-init.js';
+    import { ref, onValue } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js';
 
-        // ---------- Config ----------
-        const timeSlots = ['10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '05:00 PM', '06:00 PM', '07:00 PM', '08:00 PM'];
-        const resultTimes = [10, 11, 12, 13, 17, 18, 19, 20]; // used only for reveal gating (unchanged)
+    // ---------- Config ----------
+    const timeSlots = ['10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '05:00 PM', '06:00 PM', '07:00 PM', '08:00 PM'];
+    const resultTimes = [10, 11, 12, 13, 17, 18, 19, 20]; // reveal by hour (24h)
 
-        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-        // ---------- DOM ----------
-        const resultBody = document.getElementById('result-body');
-        const monthSelect = document.getElementById('monthSelect');
-        const yearSelect = document.getElementById('yearSelect');
-        const applyBtn = document.getElementById('applyBtn');
-        const showAllBtn = document.getElementById('showAllBtn');
-        const downloadBtn = document.getElementById('downloadPngBtn');
+    // ---------- DOM ----------
+    const resultBody = document.getElementById('result-body');
+    const monthSelect = document.getElementById('monthSelect');
+    const yearSelect = document.getElementById('yearSelect');
+    const applyBtn = document.getElementById('applyBtn');
+    const showAllBtn = document.getElementById('showAllBtn');
+    const downloadBtn = document.getElementById('downloadPngBtn');
 
-        // Fill month dropdown
-        monthNames.forEach((m, i) => {
-            const opt = document.createElement('option');
-            opt.value = String(i + 1).padStart(2, '0');
-            opt.textContent = m;
-            monthSelect.appendChild(opt);
+    // Fill month dropdown
+    monthNames.forEach((m, i) => {
+      const opt = document.createElement('option');
+      opt.value = String(i + 1).padStart(2, '0');
+      opt.textContent = m;
+      monthSelect.appendChild(opt);
+    });
+
+    // Defaults to current month/year
+    const now = new Date();
+    monthSelect.value = String(now.getMonth() + 1).padStart(2, '0');
+
+    let allData = {};
+    let filter = { year: String(now.getFullYear()), month: monthSelect.value };
+
+    // ---------- Date helpers (avoid UTC shift bugs) ----------
+    function toLocalISODate(d) {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+    const today = new Date();
+    const todayISO = toLocalISODate(today);
+
+    // ---------- Initial render (so page isn't empty before Firebase returns) ----------
+    render();
+
+    // ---------- Firebase Live Data ----------
+    const rootRef = ref(db, 'lottery');
+    onValue(rootRef, (snapshot) => {
+      allData = snapshot.val() || {};
+      populateYearSelect(allData);
+
+      if (![...yearSelect.options].some(o => o.value === filter.year)) {
+        filter.year = yearSelect.value || String(now.getFullYear());
+      }
+      updateTitle();
+      render();
+    });
+
+    // ---------- Helpers ----------
+    function populateYearSelect(data) {
+      const years = new Set();
+      Object.keys(data || {}).forEach(d => {
+        const y = d.split('-')[0];
+        if (y && /^\d{4}$/.test(y)) years.add(y);
+      });
+
+      if (years.size === 0) {
+        years.add(String(now.getFullYear() - 1));
+        years.add(String(now.getFullYear()));
+        years.add(String(now.getFullYear() + 1));
+      }
+
+      yearSelect.innerHTML = '';
+      Array.from(years).sort().forEach(y => {
+        const opt = document.createElement('option');
+        opt.value = y; opt.textContent = y;
+        yearSelect.appendChild(opt);
+      });
+
+      if (!yearSelect.value) yearSelect.value = String(now.getFullYear());
+    }
+
+    function formatDate(dateStr) {
+      const [y, m, d] = dateStr.split('-');
+      return `${d}/${m}/${y}`;
+    }
+
+    function updateTitle() {
+      const monthName = monthNames[parseInt(monthSelect.value, 10) - 1];
+      document.title = `DEAR MC - Result Chart — ${monthName}`;
+    }
+
+    // ---------- Render ----------
+    function render() {
+      resultBody.innerHTML = '';
+
+      const year = filter?.year || new Date().getFullYear();
+      const month = filter?.month || String(new Date().getMonth() + 1).padStart(2, '0');
+      const totalDays = new Date(year, parseInt(month, 10), 0).getDate();
+
+      const currentHour = new Date().getHours();
+      const rows = [];
+
+      for (let day = 1; day <= totalDays; day++) {
+        const dateStr = `${year}-${month}-${String(day).padStart(2, '0')}`;
+        const tr = document.createElement('tr');
+
+        const tdDate = document.createElement('td');
+        tdDate.className = 'col-date';
+        tdDate.textContent = formatDate(dateStr);
+        tr.appendChild(tdDate);
+
+        timeSlots.forEach((slot, idx) => {
+          const td = document.createElement('td');
+          const hour = resultTimes[idx];
+
+          const isPastDate = dateStr < todayISO;
+          const isToday = dateStr === todayISO;
+
+          // Show past days always; show today only at/after the slot hour
+          const canShow = isPastDate || (isToday && (currentHour >= hour));
+
+          const value = canShow ? (allData?.[dateStr]?.[slot]?.result ?? '-') : '-';
+          td.textContent = value;
+
+          tr.appendChild(td);
         });
 
-        // Defaults to current month/year
-        const now = new Date();
-        monthSelect.value = String(now.getMonth() + 1).padStart(2, '0');
+        rows.push(tr);
+      }
 
-        let allData = {};
-        let filter = { year: String(now.getFullYear()), month: monthSelect.value };
+      rows.forEach(r => resultBody.appendChild(r));
+    }
 
-        // ---------- Firebase Live Data ----------
-        const rootRef = ref(db, 'lottery'); // path unchanged
-        onValue(rootRef, (snapshot) => {
-            allData = snapshot.val() || {};
-            populateYearSelect(allData);
+    // ---------- Filters ----------
+    const applyFilter = () => {
+      filter = { year: yearSelect.value, month: monthSelect.value };
+      updateTitle();
+      render();
+    };
 
-            if (![...yearSelect.options].some(o => o.value === filter.year)) {
-                filter.year = yearSelect.value || String(now.getFullYear());
-            }
-            updateTitle();
-            render();
+    applyBtn.addEventListener('click', applyFilter);
+    monthSelect.addEventListener('change', applyFilter);
+    yearSelect.addEventListener('change', applyFilter);
+
+    // Reset to implicit current y/m (as Machine)
+    showAllBtn.addEventListener('click', () => {
+      filter = null;
+      updateTitle();
+      render();
+    });
+
+    // ---------- Robust PNG Export (off-screen clone; no cropping/extra space) ----------
+    function downloadDataUrl(dataUrl, filename) {
+      const a = document.createElement('a');
+      a.href = dataUrl; a.download = filename;
+      document.body.appendChild(a); a.click(); a.remove();
+    }
+
+    async function exportTableAsPNG() {
+      const table = document.getElementById('result-table');
+
+      // Deep clone into off-screen wrapper (visible, not display:none/hidden)
+      const clone = table.cloneNode(true);
+      const wrapper = document.createElement('div');
+      wrapper.style.position = 'fixed';
+      wrapper.style.left = '-100000px';
+      wrapper.style.top = '0';
+      wrapper.style.zIndex = '-1';
+      wrapper.style.background = '#ffffff';
+      wrapper.style.margin = '0';
+      wrapper.style.padding = '0';
+      wrapper.style.border = '0';
+      document.body.appendChild(wrapper);
+      wrapper.appendChild(clone);
+
+      // Normalize clone spacing and keep borders
+      Object.assign(clone.style, {
+        margin: '0',
+        padding: '0',
+        width: 'auto',
+        height: 'auto',
+        maxWidth: 'none',
+        maxHeight: 'none',
+        transform: 'none',
+        transformOrigin: 'top left',
+        background: '#ffffff',
+        borderCollapse: 'separate'
+      });
+
+      // Ensure cells don't wrap/overflow (critical for date/time columns)
+      clone.querySelectorAll('th, td').forEach(el => {
+        el.style.whiteSpace = 'nowrap';
+        el.style.overflow = 'hidden';
+        el.style.textOverflow = 'ellipsis';
+      });
+
+      // Wait a frame for layout to settle
+      await new Promise(r => requestAnimationFrame(r));
+
+      const width = Math.ceil(clone.scrollWidth);
+      const height = Math.ceil(clone.scrollHeight) + 10; // keep bottom border
+
+      try {
+        if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch { } }
+        const dataUrl = await window.htmlToImage.toPng(clone, {
+          width, height,
+          pixelRatio: 2,
+          backgroundColor: '#ffffff',
+          cacheBust: true,
+          style: { margin: '0', padding: '0', transform: 'none', background: '#ffffff' }
         });
+        downloadDataUrl(dataUrl, `result-table-${toLocalISODate(new Date())}.png`);
+      } catch (e) {
+        console.error('PNG export failed:', e);
+        alert('PNG export failed: ' + e.message);
+      } finally {
+        wrapper.remove();
+      }
+    }
 
-        // ---------- Helpers ----------
-        function populateYearSelect(data) {
-            const years = new Set();
-            Object.keys(data || {}).forEach(d => {
-                const y = d.split('-')[0];
-                if (y && /^\d{4}$/.test(y)) years.add(y);
-            });
-
-            if (years.size === 0) {
-                years.add(String(now.getFullYear() - 1));
-                years.add(String(now.getFullYear()));
-                years.add(String(now.getFullYear() + 1));
-            }
-
-            yearSelect.innerHTML = '';
-            Array.from(years).sort().forEach(y => {
-                const opt = document.createElement('option');
-                opt.value = y; opt.textContent = y;
-                yearSelect.appendChild(opt);
-            });
-
-            if (!yearSelect.value) yearSelect.value = String(now.getFullYear());
-        }
-
-        function formatDate(dateStr) {
-            const [y, m, d] = dateStr.split('-');
-            return `${d}/${m}/${y}`;
-        }
-
-        function updateTitle() {
-            const monthName = monthNames[parseInt(monthSelect.value, 10) - 1];
-            document.title = `DEAR MC - Result Chart — ${monthName}`;
-        }
-
-        // ---------- Render (keeps original gating & .result path) ----------
-        function render() {
-            resultBody.innerHTML = '';
-
-            const year = filter?.year || new Date().getFullYear();
-            const month = filter?.month || String(new Date().getMonth() + 1).padStart(2, '0');
-            const totalDays = new Date(year, parseInt(month, 10), 0).getDate();
-
-            const todayISO = new Date().toISOString().split('T')[0];
-            const currentHour = new Date().getHours();
-            const rows = [];
-
-            for (let day = 1; day <= totalDays; day++) {
-                const dateStr = `${year}-${month}-${String(day).padStart(2, '0')}`;
-                const tr = document.createElement('tr');
-
-                const tdDate = document.createElement('td');
-                tdDate.textContent = formatDate(dateStr);
-                tr.appendChild(tdDate);
-
-                timeSlots.forEach((slot, idx) => {
-                    const td = document.createElement('td');
-                    const hour = resultTimes[idx];
-
-                    const isPastDate = dateStr < todayISO;
-                    const isToday = dateStr === todayISO;
-
-                    // ✅ Keep your original Result logic: show today only at/after the slot hour
-                    const canShow = isPastDate || (isToday && (currentHour >= hour));
-
-                    // ✅ Value path untouched: ...[dateStr]?.[slot]?.result
-                    const value = canShow ? (allData?.[dateStr]?.[slot]?.result ?? '-') : '-';
-                    td.textContent = value;
-
-                    tr.appendChild(td);
-                });
-
-                rows.push(tr);
-            }
-
-            rows.forEach(r => resultBody.appendChild(r));
-        }
-
-        // ---------- Filters ----------
-        const applyFilter = () => {
-            filter = { year: yearSelect.value, month: monthSelect.value };
-            updateTitle();
-            render();
-        };
-
-        applyBtn.addEventListener('click', applyFilter);
-        monthSelect.addEventListener('change', applyFilter);
-        yearSelect.addEventListener('change', applyFilter);
-
-        // Same UX as Machine page: reset to no explicit filter (renders current y/m)
-        showAllBtn.addEventListener('click', () => {
-            filter = null;
-            updateTitle();
-            render();
-        });
-
-        // ---------- Robust PNG Export (off-screen clone; no cropping/extra top space) ----------
-        function downloadDataUrl(dataUrl, filename) {
-            const a = document.createElement('a');
-            a.href = dataUrl;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-        }
-
-        async function exportTableAsPNG() {
-            const table = document.getElementById('result-table');
-
-            // 1) Deep clone into off-screen wrapper
-            const clone = table.cloneNode(true);
-            const wrapper = document.createElement('div');
-            wrapper.style.position = 'fixed';
-            wrapper.style.left = '-100000px';
-            wrapper.style.top = '0';
-            wrapper.style.zIndex = '-1';
-            wrapper.style.background = '#ffffff';
-            wrapper.style.margin = '0';
-            wrapper.style.padding = '0';
-            wrapper.style.border = '0';
-            wrapper.appendChild(clone);
-            document.body.appendChild(wrapper);
-
-            // 2) Reset clone spacing to avoid phantom top padding
-            clone.style.margin = '0';
-            clone.style.padding = '0';
-            clone.style.width = 'auto';
-            clone.style.height = 'auto';
-            clone.style.maxWidth = 'none';
-            clone.style.maxHeight = 'none';
-            clone.style.transform = 'none';
-            clone.style.transformOrigin = 'top left';
-            clone.style.background = '#ffffff';
-            clone.style.borderCollapse = 'collapse';
-
-            // 3) Ensure fonts are ready
-            if (document.fonts && document.fonts.ready) {
-                try { await document.fonts.ready; } catch { }
-            }
-
-            // 4) Measure and add small bottom buffer to keep last border
-            const width = Math.ceil(clone.scrollWidth);
-            const height = Math.ceil(clone.scrollHeight) + 10;
-
-            try {
-                const dataUrl = await window.htmlToImage.toPng(clone, {
-                    width,
-                    height,
-                    pixelRatio: 2,
-                    backgroundColor: '#ffffff',
-                    cacheBust: true,
-                    style: { margin: '0', padding: '0', transform: 'none', background: '#ffffff' }
-                });
-
-                downloadDataUrl(dataUrl, `result-table-${new Date().toISOString().slice(0, 10)}.png`);
-            } catch (e) {
-                console.error('PNG export failed:', e);
-                alert('PNG export failed: ' + e.message);
-            } finally {
-                wrapper.remove();
-            }
-        }
-
-        downloadBtn.addEventListener('click', exportTableAsPNG);
-    </script>
+    downloadBtn.addEventListener('click', exportTableAsPNG);
+  </script>
 </body>
 
 </html>
