@@ -5,10 +5,248 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DEAR MC</title>
-  <link rel="stylesheet" href="index.css">
   <script type="module" src="firebase-init.js" defer></script>
   <script type="module" src="home.js" defer></script>
+
   <style>
+    /* =========================
+       Tokens
+       ========================= */
+    :root {
+      --rows: 8;
+      --gap: 16px;
+      --bg1: #e7f8ff;
+      --bg2: #ffffff;
+
+      --ink: #222;
+      --panel: #ffffff;
+      --panel-brd: rgba(0, 0, 0, .08);
+      --shadow: 0 8px 24px rgba(0, 0, 0, .08);
+
+      --accent-a: #00f0ff;
+      --accent-b: #ff00d4;
+
+      --box-size: clamp(28px, 6vh, 56px);
+      --box-font: clamp(14px, 2.4vh, 22px);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--ink);
+      background: linear-gradient(135deg, var(--bg1), var(--bg2));
+      height: 100dvh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* =========================
+       Header + Labels
+       ========================= */
+    header {
+      flex: 0 0 auto;
+      width: 100%;
+      display: grid;
+      place-items: center;
+      padding: 22px 12px 8px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2.4rem;
+      background: -webkit-linear-gradient(#00f0ff, #ff0080);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .label-bar {
+      flex: 0 0 auto;
+      width: min(92vw, 820px);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--gap);
+      padding: 10px 14px;
+      font-weight: 800;
+      font-size: clamp(16px, 2.2vh, 22px);
+      background: rgba(0, 240, 255, 0.06);
+      border-bottom: 1px solid #c7eafd;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    /* =========================
+       Cards wrapper
+       ========================= */
+    .cards-wrapper {
+      width: min(92vw, 820px);
+      margin: 12px auto 16px;
+      flex: 1 1 auto;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--gap);
+      overflow: hidden;
+    }
+
+    .card-column {
+      display: grid;
+      grid-template-rows: repeat(var(--rows), 1fr);
+      gap: var(--gap);
+      min-height: 0;
+    }
+
+    .card-column1 {
+      display: grid;
+      grid-template-rows: repeat(var(--rows), 1fr);
+      gap: var(--gap);
+      min-height: 0;
+      color: green;
+    }
+
+    /* =========================
+       Card Base
+       ========================= */
+    .card {
+      position: relative;
+      background: var(--panel);
+      border: 1px solid var(--panel-brd);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-auto-rows: max-content 1fr;
+      align-items: start;
+      justify-items: center;
+      padding: clamp(10px, 1.4vh, 14px) clamp(8px, 1.2vh, 12px);
+      min-height: 0;
+      height: auto !important;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      padding: 4px;
+      border-radius: 16px;
+      background: linear-gradient(45deg, var(--accent-a), var(--accent-b), var(--accent-a));
+      background-size: 400% 400%;
+      animation: borderRoll 8s linear infinite;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      z-index: 1;
+    }
+
+    @keyframes borderRoll {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    .card h4 {
+      position: relative;
+      z-index: 2;
+      margin: 0 0 clamp(6px, 1vh, 10px);
+      font-size: clamp(12px, 2vh, 16px);
+      font-weight: 800;
+      color: #222;
+      text-align: center;
+    }
+
+    .number-boxes {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: clamp(6px, 0.9vh, 10px);
+      flex-wrap: nowrap;
+      min-height: 0;
+    }
+
+    .number-box {
+      font-size: var(--box-font);
+      font-weight: 900;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .number-box1 {
+      color: #222;
+      font-size: var(--box-font);
+      font-weight: 900;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* =========================
+       Color Difference (MC / RESULT)
+       ========================= */
+    .card-column:first-child .card {
+      background: linear-gradient(135deg, #dff6ff, #b8eaff);
+    }
+
+    .card-column1:last-child .card {
+      background: linear-gradient(135deg, #ffe3f1, #ffc7e0);
+    }
+
+    /* =========================
+       Responsive
+       ========================= */
+    @media (max-width: 768px) {
+      .cards-wrapper {
+        width: min(94vw, 720px);
+      }
+
+      .label-bar {
+        width: min(94vw, 720px);
+      }
+
+      .card {
+        height: auto !important;
+      }
+
+      .number-box {
+        font-size: 20px;
+      }
+    }
+
+    @media (max-width: 390px) {
+      .number-boxes {
+        flex-wrap: wrap;
+        margin-top: -5px;
+      }
+    }
+
+    /* =========================
+       Sidebar & Menu Icon
+       ========================= */
     .menu-icon {
       position: absolute;
       top: 20px;
@@ -53,6 +291,7 @@
       margin-bottom: 10px;
       font-weight: bold;
       transition: background 0.2s;
+      border-radius: 6px;
     }
 
     .sidebar a:hover {
@@ -67,29 +306,16 @@
       cursor: pointer;
       color: #333;
     }
-
-    header {
-      text-align: center;
-      padding: 30px 10px 10px;
-    }
-
-    header h1 {
-      font-size: 2.4rem;
-      background: -webkit-linear-gradient(#00f0ff, #ff0080);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
   </style>
 </head>
 
 <body>
+  <!-- Menu Icon -->
   <div class="menu-icon" onclick="document.querySelector('.sidebar').classList.add('active')">
-    <span></span>
-    <span></span>
-    <span></span>
+    <span></span><span></span><span></span>
   </div>
 
+  <!-- Sidebar -->
   <div class="sidebar">
     <span class="close-btn" onclick="document.querySelector('.sidebar').classList.remove('active')">&times;</span>
     <a href="index.html">Home</a>
@@ -99,16 +325,19 @@
     <a href="results.html">Result</a>
   </div>
 
+  <!-- Header -->
   <header>
     <h1>DEAR MC</h1>
   </header>
+
   <div class="label-bar">
     <div>MC NUMBER</div>
     <div>RESULT</div>
   </div>
+
   <div class="cards-wrapper">
     <div class="card-column" id="machine-column"></div>
-    <div class="card-column" id="result-column"></div>
+    <div class="card-column1" id="result-column"></div>
   </div>
 </body>
 

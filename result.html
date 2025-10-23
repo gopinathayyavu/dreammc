@@ -10,11 +10,9 @@
       --cell-pad-y: 8px;
       --cell-pad-x: 6px;
       --col-min: 78px;
-      /* compact column width */
       --font-size: 13px;
       --font-size-th: 14px;
       --line-strong: #000000;
-      /* strong borders like Machine Chart */
       --line-strong-w: 2px;
     }
 
@@ -26,14 +24,14 @@
 
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #e7f8ff, #ffffff);
+      background: linear-gradient(135deg, #eef8ff, #ffffff);
       color: #222;
       overflow-x: hidden;
     }
 
-    h1 {
+    .header {
       text-align: center;
-      background: -webkit-linear-gradient(#00f0ff, #ff0080);
+      background: -webkit-linear-gradient(#00d5ff, #ff66a3);
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -67,7 +65,7 @@
       left: -250px;
       width: 250px;
       height: 100%;
-      background: linear-gradient(135deg, #f0f8ff, #e6e6fa);
+      background: linear-gradient(135deg, #f7fbff, #edeaff);
       box-shadow: 4px 0 12px rgba(0, 0, 0, .1);
       padding: 60px 20px;
       transition: left .3s ease;
@@ -134,18 +132,12 @@
       border: 1px solid #d8ecff;
     }
 
-    .toolbar button.neutral {
-      background: #ffffff;
-      color: #0f172a;
-      border: 1px solid #cbd5e1;
-    }
-
     .dwn-btn {
       background: linear-gradient(135deg, #00cfff, #00a8ff);
       color: #fff;
       border: none;
       cursor: pointer;
-      font-weight: 700;
+      font-weight: 800;
       padding: 10px;
       border-radius: 8px;
     }
@@ -161,65 +153,59 @@
       overflow-x: auto;
     }
 
-    /* IMPORTANT for PNG export: use separate borders, no spacing, nowrap cells */
     table {
       width: auto;
       min-width: 560px;
       border-collapse: separate;
-      /* prevents border clipping in exports */
       border-spacing: 0;
       margin-top: 14px;
       background: #fff;
-      border: var(--line-strong-w) solid var(--line-strong);
-      box-shadow: 0 2px 10px rgba(0, 0, 0, .1);
+      border: 1px solid gray;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, .08);
       margin-left: auto;
       margin-right: auto;
-      table-layout: auto;
-      /* allow natural width for nowrap cells */
     }
 
     th,
     td {
-      border: var(--line-strong-w) solid var(--line-strong);
-      padding: var(--cell-pad-y) var(--cell-pad-x);
+      border: 1px solid gray;
+      padding: 2px;
       text-align: center;
       vertical-align: middle;
       min-width: var(--col-min);
       white-space: nowrap;
-      /* keep content inside the cell */
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
     th {
-      background: #00a8ff;
+      background: #60b9f9;
       color: #fff;
-      font-size: 20px;
+      font-size: 26px;
       font-weight: 900;
+      letter-spacing: 0.5px;
     }
 
     td {
-      font-size: 20px;
+      font-size: 26px;
       color: #0f172a;
-      font-weight: 900;
+      font-weight: 950;
     }
 
-    /* Alternating row & first-col styles */
-    tr:nth-child(even) td {
-      background: #8cc3fa;
+    tbody td:not(:first-child) {
+      font-size: 30px;
+      font-weight: 1000;
     }
 
     tbody tr td:first-child {
-      background: #00a8ff;
+      background: #60b9f9;
       color: #fff;
-      font-weight: 900;
+      font-weight: 950;
     }
 
     .col-date {
       min-width: 130px;
     }
-
-    /* safe width for dd/mm/yyyy */
 
     .empty-row td {
       color: #64748b;
@@ -240,14 +226,10 @@
         grid-template-columns: 1fr 1fr;
       }
 
-      .toolbar button {
-        grid-column: span 1;
-      }
-
       th,
       td {
-        font-size: 12px;
-        padding: 8px 6px;
+        font-size: 26px;
+        padding: 2px;
       }
 
       :root {
@@ -275,7 +257,7 @@
     <a href="results.html">Result</a>
   </div>
 
-  <h1>DEAR MC - Result Chart</h1>
+  <h1 class="header">DEAR MC - Result Chart</h1>
 
   <div class="toolbar">
     <select id="monthSelect" aria-label="Select month"></select>
@@ -288,7 +270,9 @@
     <table id="result-table">
       <thead>
         <tr>
-          <th colspan="9" style="font-size:18px; padding:14px 0;">DEARMC - Result Chart</th>
+          <th colspan="9" style="font-size:55px; padding:14px 0;">
+            Dear-MC Result Number Chart
+          </th>
         </tr>
         <tr>
           <th class="col-date">Date</th>
@@ -313,20 +297,13 @@
   <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
 
   <script type="module">
-    // ==============================
-    // DEAR MC — Result Chart
-    // ==============================
-
     import { db } from './firebase-init.js';
     import { ref, onValue } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js';
 
-    // ---------- Config ----------
     const timeSlots = ['10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '05:00 PM', '06:00 PM', '07:00 PM', '08:00 PM'];
-    const resultTimes = [10, 11, 12, 13, 17, 18, 19, 20]; // reveal by hour (24h)
-
+    const resultTimes = [10, 11, 12, 13, 17, 18, 19, 20];
     const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-    // ---------- DOM ----------
     const resultBody = document.getElementById('result-body');
     const monthSelect = document.getElementById('monthSelect');
     const yearSelect = document.getElementById('yearSelect');
@@ -334,7 +311,6 @@
     const showAllBtn = document.getElementById('showAllBtn');
     const downloadBtn = document.getElementById('downloadPngBtn');
 
-    // Fill month dropdown
     monthNames.forEach((m, i) => {
       const opt = document.createElement('option');
       opt.value = String(i + 1).padStart(2, '0');
@@ -342,32 +318,18 @@
       monthSelect.appendChild(opt);
     });
 
-    // Defaults to current month/year
     const now = new Date();
     monthSelect.value = String(now.getMonth() + 1).padStart(2, '0');
 
     let allData = {};
     let filter = { year: String(now.getFullYear()), month: monthSelect.value };
 
-    // ---------- Date helpers (avoid UTC shift bugs) ----------
-    function toLocalISODate(d) {
-      const y = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      return `${y}-${m}-${day}`;
-    }
-    const today = new Date();
-    const todayISO = toLocalISODate(today);
-
-    // ---------- Initial render (so page isn't empty before Firebase returns) ----------
     render();
 
-    // ---------- Firebase Live Data ----------
     const rootRef = ref(db, 'lottery');
     onValue(rootRef, (snapshot) => {
       allData = snapshot.val() || {};
       populateYearSelect(allData);
-
       if (![...yearSelect.options].some(o => o.value === filter.year)) {
         filter.year = yearSelect.value || String(now.getFullYear());
       }
@@ -375,27 +337,24 @@
       render();
     });
 
-    // ---------- Helpers ----------
     function populateYearSelect(data) {
       const years = new Set();
       Object.keys(data || {}).forEach(d => {
         const y = d.split('-')[0];
         if (y && /^\d{4}$/.test(y)) years.add(y);
       });
-
       if (years.size === 0) {
         years.add(String(now.getFullYear() - 1));
         years.add(String(now.getFullYear()));
         years.add(String(now.getFullYear() + 1));
       }
-
       yearSelect.innerHTML = '';
       Array.from(years).sort().forEach(y => {
         const opt = document.createElement('option');
-        opt.value = y; opt.textContent = y;
+        opt.value = y;
+        opt.textContent = y;
         yearSelect.appendChild(opt);
       });
-
       if (!yearSelect.value) yearSelect.value = String(now.getFullYear());
     }
 
@@ -409,17 +368,17 @@
       document.title = `DEAR MC - Result Chart — ${monthName}`;
     }
 
-    // ---------- Render ----------
     function render() {
       resultBody.innerHTML = '';
-
       const year = filter?.year || new Date().getFullYear();
       const month = filter?.month || String(new Date().getMonth() + 1).padStart(2, '0');
       const totalDays = new Date(year, parseInt(month, 10), 0).getDate();
 
-      const currentHour = new Date().getHours();
-      const rows = [];
+      const today = new Date();
+      const todayISO = today.toISOString().split('T')[0];
+      const currentHour = today.getHours();
 
+      const rows = [];
       for (let day = 1; day <= totalDays; day++) {
         const dateStr = `${year}-${month}-${String(day).padStart(2, '0')}`;
         const tr = document.createElement('tr');
@@ -432,26 +391,19 @@
         timeSlots.forEach((slot, idx) => {
           const td = document.createElement('td');
           const hour = resultTimes[idx];
-
           const isPastDate = dateStr < todayISO;
           const isToday = dateStr === todayISO;
-
-          // Show past days always; show today only at/after the slot hour
           const canShow = isPastDate || (isToday && (currentHour >= hour));
-
           const value = canShow ? (allData?.[dateStr]?.[slot]?.result ?? '-') : '-';
           td.textContent = value;
-
           tr.appendChild(td);
         });
 
         rows.push(tr);
       }
-
       rows.forEach(r => resultBody.appendChild(r));
     }
 
-    // ---------- Filters ----------
     const applyFilter = () => {
       filter = { year: yearSelect.value, month: monthSelect.value };
       updateTitle();
@@ -462,24 +414,23 @@
     monthSelect.addEventListener('change', applyFilter);
     yearSelect.addEventListener('change', applyFilter);
 
-    // Reset to implicit current y/m (as Machine)
     showAllBtn.addEventListener('click', () => {
       filter = null;
       updateTitle();
       render();
     });
 
-    // ---------- Robust PNG Export (off-screen clone; no cropping/extra space) ----------
     function downloadDataUrl(dataUrl, filename) {
       const a = document.createElement('a');
-      a.href = dataUrl; a.download = filename;
-      document.body.appendChild(a); a.click(); a.remove();
+      a.href = dataUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
     }
 
     async function exportTableAsPNG() {
       const table = document.getElementById('result-table');
-
-      // Deep clone into off-screen wrapper (visible, not display:none/hidden)
       const clone = table.cloneNode(true);
       const wrapper = document.createElement('div');
       wrapper.style.position = 'fixed';
@@ -489,11 +440,9 @@
       wrapper.style.background = '#ffffff';
       wrapper.style.margin = '0';
       wrapper.style.padding = '0';
-      wrapper.style.border = '0';
       document.body.appendChild(wrapper);
       wrapper.appendChild(clone);
 
-      // Normalize clone spacing and keep borders
       Object.assign(clone.style, {
         margin: '0',
         padding: '0',
@@ -502,34 +451,30 @@
         maxWidth: 'none',
         maxHeight: 'none',
         transform: 'none',
-        transformOrigin: 'top left',
         background: '#ffffff',
         borderCollapse: 'separate'
       });
-
-      // Ensure cells don't wrap/overflow (critical for date/time columns)
       clone.querySelectorAll('th, td').forEach(el => {
         el.style.whiteSpace = 'nowrap';
         el.style.overflow = 'hidden';
         el.style.textOverflow = 'ellipsis';
       });
 
-      // Wait a frame for layout to settle
       await new Promise(r => requestAnimationFrame(r));
-
       const width = Math.ceil(clone.scrollWidth);
-      const height = Math.ceil(clone.scrollHeight) + 10; // keep bottom border
+      const height = Math.ceil(clone.scrollHeight) + 10;
 
       try {
         if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch { } }
         const dataUrl = await window.htmlToImage.toPng(clone, {
-          width, height,
+          width,
+          height,
           pixelRatio: 2,
           backgroundColor: '#ffffff',
           cacheBust: true,
           style: { margin: '0', padding: '0', transform: 'none', background: '#ffffff' }
         });
-        downloadDataUrl(dataUrl, `result-table-${toLocalISODate(new Date())}.png`);
+        downloadDataUrl(dataUrl, `result-table-${new Date().toISOString().slice(0, 10)}.png`);
       } catch (e) {
         console.error('PNG export failed:', e);
         alert('PNG export failed: ' + e.message);
