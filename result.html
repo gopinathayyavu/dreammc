@@ -14,13 +14,10 @@
       --font-size-th: 14px;
       --line-strong: #000000;
       --line-strong-w: 2px;
+      --scale: 1; /* auto-updated via JS */
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -42,203 +39,102 @@
     /* Sidebar */
     .menu-icon {
       position: absolute;
-      top: 20px;
-      left: 20px;
-      width: 30px;
-      height: 25px;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+      top: 20px; left: 20px;
+      width: 30px; height: 25px;
+      cursor: pointer; display: flex;
+      flex-direction: column; justify-content: space-between;
       z-index: 1100;
     }
-
-    .menu-icon span {
-      height: 4px;
-      background: #333;
-      border-radius: 2px;
-    }
+    .menu-icon span { height: 4px; background: #333; border-radius: 2px; }
 
     .sidebar {
-      position: fixed;
-      top: 0;
-      left: -250px;
-      width: 250px;
-      height: 100%;
+      position: fixed; top: 0; left: -250px; width: 250px; height: 100%;
       background: linear-gradient(135deg, #f7fbff, #edeaff);
-      box-shadow: 4px 0 12px rgba(0, 0, 0, .1);
-      padding: 60px 20px;
-      transition: left .3s ease;
-      z-index: 1000;
+      box-shadow: 4px 0 12px rgba(0,0,0,.1);
+      padding: 60px 20px; transition: left .3s ease; z-index: 1000;
     }
-
-    .sidebar.active {
-      left: 0;
-    }
-
+    .sidebar.active { left: 0; }
     .sidebar a {
-      display: block;
-      padding: 12px;
-      color: #333;
-      text-decoration: none;
-      margin-bottom: 10px;
-      font-weight: bold;
-      transition: background .2s;
+      display: block; padding: 12px; color: #333; text-decoration: none;
+      margin-bottom: 10px; font-weight: bold; transition: background .2s;
     }
-
-    .sidebar a:hover {
-      background: #ddd;
-    }
-
+    .sidebar a:hover { background: #ddd; }
     .sidebar .close-btn {
-      position: absolute;
-      top: 10px;
-      right: 15px;
-      font-size: 24px;
-      cursor: pointer;
-      color: #333;
+      position: absolute; top: 10px; right: 15px; font-size: 24px;
+      cursor: pointer; color: #333;
     }
 
     /* Toolbar */
     .toolbar {
-      width: 75%;
+      width: min(1024px, 92vw);
       margin: 10px auto 0;
       display: grid;
       grid-template-columns: 1fr 1fr auto auto;
-      gap: 8px;
-      align-items: center;
+      gap: 8px; align-items: center;
     }
-
-    .toolbar select,
-    .toolbar button {
-      padding: 10px 12px;
-      border: 1px solid #cfe8ff;
-      border-radius: 8px;
-      background: #fff;
-      font-size: 14px;
-      font-weight: 700;
+    .toolbar select, .toolbar button {
+      padding: 10px 12px; border: 1px solid #cfe8ff;
+      border-radius: 8px; background: #fff; font-size: 14px; font-weight: 700;
     }
-
     .toolbar button {
       background: linear-gradient(135deg, #00cfff, #00a8ff);
-      color: #fff;
-      border: none;
-      cursor: pointer;
+      color: #fff; border: none; cursor: pointer;
     }
-
     .toolbar button.secondary {
-      background: #eef7ff;
-      color: #0d6efd;
-      border: 1px solid #d8ecff;
+      background: #eef7ff; color: #0d6efd; border: 1px solid #d8ecff;
     }
 
     .dwn-btn {
       background: linear-gradient(135deg, #00cfff, #00a8ff);
-      color: #fff;
-      border: none;
-      cursor: pointer;
-      font-weight: 800;
-      padding: 10px;
-      border-radius: 8px;
+      color: #fff; border: none; cursor: pointer; font-weight: 800;
+      padding: 10px 12px; border-radius: 8px;
     }
+    .dwn-btn:hover { background: linear-gradient(135deg, #00a8ff, #0080ff); }
 
-    .dwn-btn:hover {
-      background: linear-gradient(135deg, #00a8ff, #0080ff);
+    /* Scaled table wrapper (same pattern as Machine Chart) */
+    .table-outer {
+      width: min(1024px, 92vw);
+      margin: 8px auto 20px;  /* extra bottom space */
+      overflow: hidden;       /* hide overflow when scaled */
+      position: relative;
+    }
+    .table-inner {
+      transform: scale(var(--scale));
+      transform-origin: top left;
+      width: max-content; /* grow to table natural width */
+      height: auto;
     }
 
     /* Table */
-    .table-container {
-      width: 75%;
-      margin: 8px auto 16px;
-      overflow-x: auto;
-    }
-
     table {
-      width: auto;
-      min-width: 560px;
-      border-collapse: separate;
-      border-spacing: 0;
-      margin-top: 14px;
-      background: #fff;
-      border: 1px solid gray;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, .08);
-      margin-left: auto;
-      margin-right: auto;
+      width: auto; min-width: 560px;
+      border-collapse: separate; border-spacing: 0;
+      margin-top: 14px; background: #fff; border: 1px solid gray;
+      box-shadow: 0 2px 10px rgba(0,0,0,.08);
     }
-
-    th,
-    td {
-      border: 1px solid gray;
-      padding: 2px;
-      text-align: center;
-      vertical-align: middle;
-      min-width: var(--col-min);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    th, td {
+      border: 1px solid gray; padding: 2px; text-align: center; vertical-align: middle;
+      min-width: var(--col-min); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-
     th {
-      background: #11ad42bf;
-      color: #fff;
-      font-size: 26px;
-      font-weight: 900;
-      letter-spacing: 0.5px;
+      background: #11ad42bf; color: #fff; font-size: 26px; font-weight: 900; letter-spacing: .5px;
     }
-
-    td {
-      font-size: 26px;
-      color: #0f172a;
-      font-weight: 950;
-    }
-
-    tbody td:not(:first-child) {
-      font-size: 30px;
-      font-weight: 1000;
-    }
-
-    tbody tr td:first-child {
-      background: #11ad42bf;
-      color: #fff;
-      font-weight: 950;
-    }
-
-    .col-date {
-      min-width: 130px;
-    }
-
-    .empty-row td {
-      color: #64748b;
-      font-style: italic;
-      font-weight: 800;
-    }
+    td { font-size: 26px; color: #0f172a; font-weight: 950; }
+    tbody td:not(:first-child) { font-size: 30px; font-weight: 1000; }
+    tbody tr td:first-child { background: #11ad42bf; color: #fff; font-weight: 950; }
+    .col-date { min-width: 130px; }
+    .empty-row td { color: #64748b; font-style: italic; font-weight: 800; }
 
     @media (max-width:900px) {
-
-      .toolbar,
-      .table-container {
-        width: 90%;
-      }
+      :root { --col-min: 72px; }
+      th { font-size: 22px; } td { font-size: 22px; }
+      tbody td:not(:first-child) { font-size: 24px; }
+      .col-date { min-width: 112px; }
     }
-
     @media (max-width:600px) {
-      .toolbar {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      th,
-      td {
-        font-size: 26px;
-        padding: 2px;
-      }
-
-      :root {
-        --col-min: 72px;
-      }
-
-      .col-date {
-        min-width: 112px;
-      }
+      .toolbar { grid-template-columns: 1fr 1fr; }
+      th { font-size: 20px; } td { font-size: 20px; }
+      tbody td:not(:first-child) { font-size: 22px; }
     }
   </style>
 </head>
@@ -266,28 +162,31 @@
     <button id="showAllBtn" class="secondary" title="Show all dates (no filter)">Show All</button>
   </div>
 
-  <div class="table-container">
-    <table id="result-table">
-      <thead>
-        <tr>
-          <th colspan="9" style="font-size:55px; padding:14px 0;">
-            Dear-MC Result Number Chart
-          </th>
-        </tr>
-        <tr>
-          <th class="col-date">Date</th>
-          <th>10:00 AM</th>
-          <th>11:00 AM</th>
-          <th>12:00 PM</th>
-          <th>01:00 PM</th>
-          <th>05:00 PM</th>
-          <th>06:00 PM</th>
-          <th>07:00 PM</th>
-          <th>08:00 PM</th>
-        </tr>
-      </thead>
-      <tbody id="result-body"></tbody>
-    </table>
+  <!-- Scaled table viewport (replaces old table-container) -->
+  <div class="table-outer" id="tableOuter">
+    <div class="table-inner" id="tableInner">
+      <table id="result-table">
+        <thead>
+          <tr>
+            <th colspan="9" style="font-size:55px; padding:14px 0;">
+              Dear-MC Result Number Chart
+            </th>
+          </tr>
+          <tr>
+            <th class="col-date">Date</th>
+            <th>10:00 AM</th>
+            <th>11:00 AM</th>
+            <th>12:00 PM</th>
+            <th>01:00 PM</th>
+            <th>05:00 PM</th>
+            <th>06:00 PM</th>
+            <th>07:00 PM</th>
+            <th>08:00 PM</th>
+          </tr>
+        </thead>
+        <tbody id="result-body"></tbody>
+      </table>
+    </div>
   </div>
 
   <div style="text-align:center; margin-bottom:20px;">
@@ -311,21 +210,34 @@
     const showAllBtn = document.getElementById('showAllBtn');
     const downloadBtn = document.getElementById('downloadPngBtn');
 
+    const tableOuter = document.getElementById('tableOuter');
+    const tableInner = document.getElementById('tableInner');
+    const table = document.getElementById('result-table');
+
+    // months
     monthNames.forEach((m, i) => {
       const opt = document.createElement('option');
       opt.value = String(i + 1).padStart(2, '0');
       opt.textContent = m;
       monthSelect.appendChild(opt);
     });
-
     const now = new Date();
     monthSelect.value = String(now.getMonth() + 1).padStart(2, '0');
 
+    // state
     let allData = {};
     let filter = { year: String(now.getFullYear()), month: monthSelect.value };
 
+    // initial paint + scale
     render();
+    applyAutoScale();
 
+    // scale again once fonts are ready (prevents bottom clipping)
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => applyAutoScale()).catch(() => {});
+    }
+
+    // firebase live
     const rootRef = ref(db, 'lottery');
     onValue(rootRef, (snapshot) => {
       allData = snapshot.val() || {};
@@ -335,6 +247,7 @@
       }
       updateTitle();
       render();
+      requestAnimationFrame(applyAutoScale);
     });
 
     function populateYearSelect(data) {
@@ -351,9 +264,7 @@
       yearSelect.innerHTML = '';
       Array.from(years).sort().forEach(y => {
         const opt = document.createElement('option');
-        opt.value = y;
-        opt.textContent = y;
-        yearSelect.appendChild(opt);
+        opt.value = y; opt.textContent = y; yearSelect.appendChild(opt);
       });
       if (!yearSelect.value) yearSelect.value = String(now.getFullYear());
     }
@@ -370,15 +281,15 @@
 
     function render() {
       resultBody.innerHTML = '';
-      const year = filter?.year || new Date().getFullYear();
+
+      const year = filter?.year || String(new Date().getFullYear());
       const month = filter?.month || String(new Date().getMonth() + 1).padStart(2, '0');
-      const totalDays = new Date(year, parseInt(month, 10), 0).getDate();
+      const totalDays = new Date(Number(year), parseInt(month, 10), 0).getDate();
 
       const today = new Date();
       const todayISO = today.toISOString().split('T')[0];
       const currentHour = today.getHours();
 
-      const rows = [];
       for (let day = 1; day <= totalDays; day++) {
         const dateStr = `${year}-${month}-${String(day).padStart(2, '0')}`;
         const tr = document.createElement('tr');
@@ -393,21 +304,21 @@
           const hour = resultTimes[idx];
           const isPastDate = dateStr < todayISO;
           const isToday = dateStr === todayISO;
-          const canShow = isPastDate || (isToday && (currentHour >= hour));
+          const canShow = isPastDate || (isToday && (currentHour >= hour)); // (Result logic keeps >= hour)
           const value = canShow ? (allData?.[dateStr]?.[slot]?.result ?? '-') : '-';
           td.textContent = value;
           tr.appendChild(td);
         });
 
-        rows.push(tr);
+        resultBody.appendChild(tr);
       }
-      rows.forEach(r => resultBody.appendChild(r));
     }
 
     const applyFilter = () => {
       filter = { year: yearSelect.value, month: monthSelect.value };
       updateTitle();
       render();
+      requestAnimationFrame(applyAutoScale);
     };
 
     applyBtn.addEventListener('click', applyFilter);
@@ -415,23 +326,92 @@
     yearSelect.addEventListener('change', applyFilter);
 
     showAllBtn.addEventListener('click', () => {
-      filter = null;
+      filter = null; // show all available dates
       updateTitle();
-      render();
+      // render all keys in DB (sorted) when no filter
+      resultBody.innerHTML = '';
+      const keys = Object.keys(allData || {}).filter(k => /^\d{4}-\d{2}-\d{2}$/.test(k)).sort();
+      keys.forEach(dateStr => {
+        const tr = document.createElement('tr');
+
+        const tdDate = document.createElement('td');
+        tdDate.className = 'col-date';
+        tdDate.textContent = formatDate(dateStr);
+        tr.appendChild(tdDate);
+
+        const today = new Date();
+        const todayISO = today.toISOString().split('T')[0];
+        const currentHour = today.getHours();
+
+        timeSlots.forEach((slot, idx) => {
+          const td = document.createElement('td');
+          const hour = resultTimes[idx];
+          const isPastDate = dateStr < todayISO;
+          const isToday = dateStr === todayISO;
+          const canShow = isPastDate || (isToday && (currentHour >= hour));
+          const value = canShow ? (allData?.[dateStr]?.[slot]?.result ?? '-') : '-';
+          td.textContent = value;
+          tr.appendChild(td);
+        });
+
+        resultBody.appendChild(tr);
+      });
+      requestAnimationFrame(applyAutoScale);
     });
 
+    /* ---------------- Robust auto-scale (same as Machine Chart) ---------------- */
+    function applyAutoScale() {
+      const root = document.documentElement;
+      // measure natural size at scale=1
+      root.style.setProperty('--scale', '1');
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const naturalWidth = table.scrollWidth;
+          const naturalHeight = table.scrollHeight;
+
+          const outerWidth = tableOuter.clientWidth;
+          const scale = naturalWidth > 0 ? Math.min(1, outerWidth / naturalWidth) : 1;
+
+          root.style.setProperty('--scale', String(scale));
+
+          // buffer prevents bottom clipping from rounding/late paints
+          const buffer = 18; // px
+          tableOuter.style.height = Math.ceil(naturalHeight * scale) + buffer + 'px';
+        });
+      });
+    }
+
+    // Recalculate scaling on resize and orientation changes
+    window.addEventListener('resize', applyAutoScale);
+    window.addEventListener('orientationchange', () => setTimeout(applyAutoScale, 150));
+
+    // Re-apply scale after DOM mutations (rows re-render)
+    const mo = new MutationObserver(() => applyAutoScale());
+    mo.observe(resultBody, { childList: true, subtree: false });
+
+    // Observe table box-size changes (fonts, metrics, etc.)
+    const sizeObserver = new ResizeObserver(() => applyAutoScale());
+    sizeObserver.observe(table);
+
+    // Recalc when the sidebar finishes sliding (viewport available width changes)
+    const sidebarEl = document.querySelector('.sidebar');
+    if (sidebarEl) {
+      sidebarEl.addEventListener('transitionend', (e) => {
+        if (e.propertyName === 'left') applyAutoScale();
+      });
+    }
+
+    /* ---------------- Export (full table, unscaled & complete) ---------------- */
     function downloadDataUrl(dataUrl, filename) {
       const a = document.createElement('a');
-      a.href = dataUrl;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
+      a.href = dataUrl; a.download = filename;
+      document.body.appendChild(a); a.click(); a.remove();
     }
 
     async function exportTableAsPNG() {
-      const table = document.getElementById('result-table');
       const clone = table.cloneNode(true);
+
       const wrapper = document.createElement('div');
       wrapper.style.position = 'fixed';
       wrapper.style.left = '-100000px';
@@ -440,8 +420,6 @@
       wrapper.style.background = '#ffffff';
       wrapper.style.margin = '0';
       wrapper.style.padding = '0';
-      document.body.appendChild(wrapper);
-      wrapper.appendChild(clone);
 
       Object.assign(clone.style, {
         margin: '0',
@@ -454,6 +432,10 @@
         background: '#ffffff',
         borderCollapse: 'separate'
       });
+
+      document.body.appendChild(wrapper);
+      wrapper.appendChild(clone);
+
       clone.querySelectorAll('th, td').forEach(el => {
         el.style.whiteSpace = 'nowrap';
         el.style.overflow = 'hidden';
@@ -461,11 +443,12 @@
       });
 
       await new Promise(r => requestAnimationFrame(r));
+
       const width = Math.ceil(clone.scrollWidth);
       const height = Math.ceil(clone.scrollHeight) + 10;
 
       try {
-        if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch { } }
+        if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch {} }
         const dataUrl = await window.htmlToImage.toPng(clone, {
           width,
           height,
@@ -474,7 +457,11 @@
           cacheBust: true,
           style: { margin: '0', padding: '0', transform: 'none', background: '#ffffff' }
         });
-        downloadDataUrl(dataUrl, `result-table-${new Date().toISOString().slice(0, 10)}.png`);
+        const today = new Date();
+        const y = today.getFullYear();
+        const m = String(today.getMonth() + 1).padStart(2, '0');
+        const d = String(today.getDate()).padStart(2, '0');
+        downloadDataUrl(dataUrl, `result-table-${y}-${m}-${d}.png`);
       } catch (e) {
         console.error('PNG export failed:', e);
         alert('PNG export failed: ' + e.message);
@@ -486,5 +473,4 @@
     downloadBtn.addEventListener('click', exportTableAsPNG);
   </script>
 </body>
-
 </html>
